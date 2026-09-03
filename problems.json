@@ -1,0 +1,110 @@
+[
+    {
+        "name": "Two_Sum",
+        "topic": "Hash Map",
+        "difficulty": "Hard",
+        "need_hint": true
+    },
+    {
+        "name": "Linked List",
+        "topic": "Linked List",
+        "difficulty": "Medium",
+        "need_hint": false
+    },
+    {
+        "name": "Knapsack",
+        "topic": "Dynamic Programming",
+        "difficulty": "Medium",
+        "need_hint": false
+    },
+    {
+        "name": "Longest Common Substring ",
+        "topic": "Dynamic Programming",
+        "difficulty": "Medium",
+        "need_hint": false
+    },
+    {
+        "name": "DFS",
+        "topic": "Binary Tree",
+        "difficulty": "Medium",
+        "need_hint": true
+    },
+    {
+        "name": "Tabulation",
+        "topic": "Dynamic Programming",
+        "difficulty": "Hard",
+        "need_hint": true
+    },
+    {
+        "name": "Interval Scheduling",
+        "topic": "Greedy",
+        "difficulty": "Medium",
+        "need_hint": true
+    },
+    {
+        "name": "Jump Game",
+        "topic": "Greedy",
+        "difficulty": "Medium",
+        "need_hint": true
+    },
+    {
+        "name": "House Robber",
+        "topic": "Dynamic Programming",
+        "difficulty": "Hard",
+        "need_hint": true
+    },
+    {
+        "name": "Gas Station",
+        "topic": "Greedy",
+        "difficulty": "Hard",
+        "need_hint": true
+    },
+    {
+        "name": "Prepend",
+        "topic": "Linked List",
+        "difficulty": "Easy",
+        "need_hint": false
+    },
+    {
+        "name": "BFS",
+        "topic": "Graph",
+        "difficulty": "Medium",
+        "need_hint": false
+    },
+    {
+        "name": "DFS",
+        "topic": "Graph",
+        "difficulty": "Medium",
+        "need_hint": false
+    },
+    {
+        "name": "Rotting Oranges",
+        "topic": "Graph",
+        "difficulty": "Hard",
+        "need_hint": true
+    },
+    {
+        "name": "Merge Sort",
+        "topic": "Sorting",
+        "difficulty": "Easy",
+        "need_hint": false
+    },
+    {
+        "name": "Quicksort",
+        "topic": "Sorting",
+        "difficulty": "Hard",
+        "need_hint": true
+    },
+    {
+        "name": "Min Heap",
+        "topic": "Heap",
+        "difficulty": "Medium",
+        "need_hint": true
+    },
+    {
+        "name": "Topological Sort",
+        "topic": "Graph",
+        "difficulty": "Hard",
+        "need_hint": true
+    }
+]
