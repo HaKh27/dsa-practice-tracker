@@ -153,6 +153,24 @@ def edit_topic(problems,name):
                 new_topic = input("Enter new topic: ")
                 m["topic"]= new_topic.strip().title()
 
+
+def edit_difficulty(problems, name):
+    matches= find_by_name(problems,name)
+    if len(matches)==0: 
+        print("No problem found with that name.")
+        return
+    elif len(matches)==1:
+        new_rank= input("Enter new level of difficulty: ")
+        matches[0]["difficulty"]= new_rank.strip().title()
+    elif len(matches)>1:
+        print_numbered(matches)
+        choice = input("Enter a number").strip()
+        choice = int(choice)
+        for i,m in enumerate(matches):
+            if choice == i+1:
+                new_rank= input("Enter new level of difficulty: ")
+                m["difficulty"]=new_rank.strip().title()
+                
 def heap(problems,k):
     rank = {"Hard":0, "Medium":1, "Easy":2}
     
@@ -188,8 +206,9 @@ while True:
     print("5. Sort Problems by Difficulty: ")
     print("6. Sort Problems by Name: ")
     print("7. Change Topic name: ")
-    print("8. Print 3 of the Hardest Problems:")
-    print("9. Quit?")
+    print("8. Change level of difficulty: ")
+    print("9. Print 3 of the Hardest Problems:")
+    print("10. Quit?")
     choice = input("Enter a number: ").strip()
 
     if choice == "1":
@@ -224,11 +243,17 @@ while True:
         edit_topic(problems,name)   
         save_problems(problems, "problems.json")
     elif choice == "8":
+        name= input("Enter the problem name to edit: ")
+        print("=" * 60)
+        edit_difficulty(problems,name)
+        save_problems(problems, "problems.json")
+
+    elif choice == "9":
         print("=" * 60)
         heap_p= heap(problems,3)
         print_table_v2(heap_p)  
 
-    elif choice == "9":
+    elif choice == "10":
         break
     else: 
         print("Invalid choice, try again")

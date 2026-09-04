@@ -92,7 +92,7 @@
     {
         "name": "Quicksort",
         "topic": "Sorting",
-        "difficulty": "Hard",
+        "difficulty": "Easy",
         "need_hint": true
     },
     {
