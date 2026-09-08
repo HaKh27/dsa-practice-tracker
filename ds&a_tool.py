@@ -185,7 +185,13 @@ def heap(problems,k):
         result.append(problem)
     return result 
 
-   
+def search_by_partial_name(problems,partial):
+    matches=[]
+    for p in problems: 
+        if partial.lower() in p["name"].lower():
+            matches.append(p)
+
+    return matches 
 
 
 try:
@@ -208,7 +214,8 @@ while True:
     print("7. Change Topic name: ")
     print("8. Change level of difficulty: ")
     print("9. Print 3 of the Hardest Problems:")
-    print("10. Quit?")
+    print("10. Search a problem by name using substring:")
+    print("11. Quit?")
     choice = input("Enter a number: ").strip()
 
     if choice == "1":
@@ -252,8 +259,15 @@ while True:
         print("=" * 60)
         heap_p= heap(problems,3)
         print_table_v2(heap_p)  
-
     elif choice == "10":
+        print("=" * 60)
+        partial= input("Enter partial problem name: ").strip()
+        results= search_by_partial_name(problems,partial)
+        if not results:
+            print(f"No problems found matching '{partial}'.")
+        else:
+            print_numbered(results)
+    elif choice == "11":
         break
     else: 
         print("Invalid choice, try again")
