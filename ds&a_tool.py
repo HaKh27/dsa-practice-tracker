@@ -242,9 +242,21 @@ def mark_reviewed(problems,name):
             if choice==i+1:
                 m["last_reviewed"]=str(date.today())
             
+def delete_problem(problems,name):
+    matches= find_by_name(problems,name)
+    if len(matches)==0:
+        print(f"No problem found with that {name}.")
+        return 
+    elif len(matches)==1: 
+        problems.remove(matches[0])
+    elif len(matches)>=2:
+        print_numbered(matches)
+        choice=input("Select the problem you'd like to remove: ").strip()
+        choice=int(choice)
+        for i,m in enumerate(matches):
+            if choice==i+1: 
+                problems.remove(m)
 
-        
-    
     
 
 try:
@@ -272,7 +284,8 @@ while True:
     print("9. Print 3 of the Hardest Problems:")
     print("10. Search a problem by name using substring:")
     print("11. Mark a problem as reviewed: ")
-    print("12. Quit?")
+    print("12. Delete a problem?")
+    print("13. Quit?")
     choice = input("Enter a number: ").strip()
 
     if choice == "1":
@@ -286,11 +299,11 @@ while True:
         print_numbered(result)
     elif choice == "3":
         print("=" * 40)
-        print(print_table(problems))
+        print(print_table_v2(problems))
     elif choice == "4":
         print("=" * 40)
         stale= needs_review_by_date(problems, 7)
-        print_numbered(stale)
+        print_table_v2(stale)
          
     elif choice == "5":
         print("=" * 60)
@@ -330,6 +343,11 @@ while True:
             print_table_v2(problems)
             save_problems(problems, "problems.json")
     elif choice == "12":
+            print("=" * 60)
+            name= input("Enter the name of the problem you'd like to delete: ").strip()
+            delete_problem(problems,name)
+            save_problems(problems,"problems.json")
+    elif choice == "13":
         break
     else: 
         print("Invalid choice, try again")
