@@ -3,108 +3,133 @@
         "name": "Two_Sum",
         "topic": "Hash Map",
         "difficulty": "Hard",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-08-25"
     },
     {
         "name": "Linked List",
         "topic": "Linked List",
         "difficulty": "Medium",
-        "need_hint": false
+        "need_hint": false,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Knapsack",
         "topic": "Dynamic Programming",
         "difficulty": "Medium",
-        "need_hint": false
+        "need_hint": false,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Longest Common Substring ",
         "topic": "Dynamic Programming",
         "difficulty": "Medium",
-        "need_hint": false
+        "need_hint": false,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "DFS",
         "topic": "Binary Tree",
         "difficulty": "Medium",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Tabulation",
         "topic": "Dynamic Programming",
         "difficulty": "Hard",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Interval Scheduling",
         "topic": "Greedy",
         "difficulty": "Medium",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Jump Game",
         "topic": "Greedy",
         "difficulty": "Medium",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "House Robber",
         "topic": "Dynamic Programming",
         "difficulty": "Hard",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Gas Station",
         "topic": "Greedy",
         "difficulty": "Hard",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Prepend",
         "topic": "Linked List",
         "difficulty": "Easy",
-        "need_hint": false
+        "need_hint": false,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "BFS",
         "topic": "Graph",
         "difficulty": "Medium",
-        "need_hint": false
+        "need_hint": false,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "DFS",
         "topic": "Graph",
         "difficulty": "Medium",
-        "need_hint": false
+        "need_hint": false,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Rotting Oranges",
         "topic": "Graph",
         "difficulty": "Hard",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Merge Sort",
         "topic": "Sorting",
         "difficulty": "Easy",
-        "need_hint": false
+        "need_hint": false,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Quicksort",
         "topic": "Sorting",
         "difficulty": "Easy",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Min Heap",
         "topic": "Heap",
         "difficulty": "Medium",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     },
     {
         "name": "Topological Sort",
         "topic": "Graph",
         "difficulty": "Hard",
-        "need_hint": true
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
+    },
+    {
+        "name": "Islands",
+        "topic": "2D_Array",
+        "difficulty": "Hard",
+        "need_hint": true,
+        "last_reviewed": "2026-09-09"
     }
 ]

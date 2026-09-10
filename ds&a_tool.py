@@ -1,8 +1,14 @@
 from tabulate import tabulate
-
+from datetime import date
 import json
 import random 
 import heapq
+
+def days_since(date_str):
+    stored= date.fromisoformat(date_str)
+    days_ago= (date.today()-stored).days
+
+    return days_ago 
 
 def save_problems(problems, filename="problems.json"):
      with open(filename,"w") as f:
@@ -12,14 +18,28 @@ def load_problems(filename="problems.json"):
     with open(filename, "r") as f:
         return json.load(f)
 
+def needs_review_by_date(problems,threshold_days):
+    result= []
+    for p in problems: 
+        if days_since(p["last_reviewed"])>= threshold_days:
+            result.append(p)
+
+    return result
+
+def backfill_last_reviewed(problems):
+    for p in problems: 
+        if "last_reviewed" not in p: 
+            p["last_reviewed"]= str(date.today())
+
 def add_problem(problems, name, topic, difficulty, needed_hint):
     problems.append({
         "name":name, 
         "topic": topic, 
         "difficulty": difficulty, 
-        "need_hint": needed_hint
+        "need_hint": needed_hint, 
+        "last_reviewed": str(date.today())
         })
-    
+
 def get_new_problem():
     name = input("Enter problem name: ").strip().title()
     topic = input("Enter topic name: ").strip().title()
@@ -79,7 +99,7 @@ def get_search_problem():
     topic = input("Enter topic name: ").strip().title()
 
     return topic
-
+"""""
 def search_by_topic(problems, topic):
     result = []
     topic = topic.title()
@@ -91,6 +111,19 @@ def search_by_topic(problems, topic):
 
     if not result: 
         print(f"{topic}: Topic Not Found")
+
+    return result 
+"""
+
+def search_by_topic(problems, partial):
+    result=[]
+
+    for problem in problems: 
+        if partial.lower() in problem["topic"].lower(): 
+            result.append(problem)
+
+    if not result: 
+        print(f"{partial} not found")
 
     return result 
 
@@ -193,11 +226,15 @@ def search_by_partial_name(problems,partial):
 
     return matches 
 
+    
 
 try:
     problems= load_problems("problems.json")
 except FileNotFoundError: 
     problems=[]
+backfill_last_reviewed(problems)
+
+
 
 print("\nDS&A TRACKER: ")
 print("=" * 40)
@@ -223,19 +260,18 @@ while True:
         add_problem(problems, name, topic, difficulty, hint)
         save_problems(problems, "problems.json")
     elif choice == "2":
-        topic = get_search_problem()
-        
-        result = search_by_topic(problems, topic)
         print("=" * 40)
-        print(f"Topic: {topic}")
+        partial= input("Enter partial Topic name: ").strip()
+        result = search_by_topic(problems, partial)
         print_numbered(result)
     elif choice == "3":
         print("=" * 40)
         print(print_table(problems))
     elif choice == "4":
         print("=" * 40)
-        print("Topics needing Review: \n ")
-        print(problems_needing_review(problems))   
+        stale= needs_review_by_date(problems, 7)
+        print_numbered(stale)
+         
     elif choice == "5":
         print("=" * 60)
         sorted_problem=(merge_sort(problems)) 
