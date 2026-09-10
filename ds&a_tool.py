@@ -80,9 +80,9 @@ def print_problems(problems):
 
 def print_table_v2(problems):
     rows= []
-    headers= ["Name", "Topic", "Difficulty"]
+    headers= ["Name", "Topic", "Difficulty", "Last Reviewed"]
     for p in problems:
-        rows.append([p["name"], p["topic"], p["difficulty"]])
+        rows.append([p["name"], p["topic"], p["difficulty"], p["last_reviewed"]])
     print(tabulate(rows,headers=headers, tablefmt= "grid", showindex=range(1, len(rows)+1)))
 
 def print_table(problems):
@@ -226,6 +226,25 @@ def search_by_partial_name(problems,partial):
 
     return matches 
 
+def mark_reviewed(problems,name):
+    matches= find_by_name(problems,name)
+    if len(matches)==0:
+        print(f"No problem found with that {name}.")
+        return
+    elif len(matches)==1: 
+        print_numbered(matches)
+        matches[0]["last_reviewed"]=str(date.today())
+    elif len(matches)>=2:
+        print_numbered(matches)
+        choice= input("Please choose a problem to mark as reviewed: ").strip()
+        choice= int(choice)
+        for i,m in enumerate(matches):
+            if choice==i+1:
+                m["last_reviewed"]=str(date.today())
+            
+
+        
+    
     
 
 try:
@@ -252,7 +271,8 @@ while True:
     print("8. Change level of difficulty: ")
     print("9. Print 3 of the Hardest Problems:")
     print("10. Search a problem by name using substring:")
-    print("11. Quit?")
+    print("11. Mark a problem as reviewed: ")
+    print("12. Quit?")
     choice = input("Enter a number: ").strip()
 
     if choice == "1":
@@ -304,6 +324,12 @@ while True:
         else:
             print_numbered(results)
     elif choice == "11":
+            print("=" * 60)
+            name= input("Enter a problem name that was reviewed today: ").strip()
+            mark_reviewed(problems,name)
+            print_table_v2(problems)
+            save_problems(problems, "problems.json")
+    elif choice == "12":
         break
     else: 
         print("Invalid choice, try again")
