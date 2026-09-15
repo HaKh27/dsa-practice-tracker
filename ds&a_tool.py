@@ -166,8 +166,7 @@ def quicksort(problems):
     return quicksort(left)+ [pivot]+quicksort(right)
 
 def find_by_name(problems, name):
-    matches= [p for p in problems if p["name"].lower()== name.lower()]
-    return matches 
+    return [p for p in problems if name.lower() in p["name"].lower()]
 
 def edit_topic(problems,name):
     matches= find_by_name(problems, name)
