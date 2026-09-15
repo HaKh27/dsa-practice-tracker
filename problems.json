@@ -4,7 +4,7 @@
         "topic": "Hash Map",
         "difficulty": "Hard",
         "need_hint": true,
-        "last_reviewed": "2026-09-10"
+        "last_reviewed": "2026-09-15"
     },
     {
         "name": "Linked List",
@@ -46,14 +46,14 @@
         "topic": "Greedy",
         "difficulty": "Medium",
         "need_hint": true,
-        "last_reviewed": "2026-08-30"
+        "last_reviewed": "2026-09-15"
     },
     {
         "name": "Jump Game",
         "topic": "Greedy",
         "difficulty": "Medium",
         "need_hint": true,
-        "last_reviewed": "2026-08-30"
+        "last_reviewed": "2026-09-15"
     },
     {
         "name": "House Robber",
@@ -81,7 +81,7 @@
         "topic": "Graph",
         "difficulty": "Medium",
         "need_hint": false,
-        "last_reviewed": "2026-09-10"
+        "last_reviewed": "2026-09-15"
     },
     {
         "name": "Rotting Oranges",
@@ -116,7 +116,7 @@
         "topic": "Graph",
         "difficulty": "Hard",
         "need_hint": true,
-        "last_reviewed": "2026-08-30"
+        "last_reviewed": "2026-09-15"
     },
     {
         "name": "Islands",
@@ -124,5 +124,12 @@
         "difficulty": "Hard",
         "need_hint": true,
         "last_reviewed": "2026-09-14"
+    },
+    {
+        "name": "Dijikstra",
+        "topic": "Graph",
+        "difficulty": "Medium",
+        "need_hint": false,
+        "last_reviewed": "2026-09-15"
     }
 ]

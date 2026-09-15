@@ -24,6 +24,25 @@ def create_table(conn):
     """)
     conn.commit()
 
+def insert_problems(conn,name,topic,difficulty,last_reviewed):
+    conn.execute("""
+        INSERT INTO problems(name,topic, difficulty,last_reviewed)
+        VALUES(?,?,?,?)
+    """, (name, topic, difficulty,last_reviewed))
+    conn.commit()    
+
+def get_all_problems(conn):
+    cursor= conn.execute("SELECT * FROM problems")
+    return cursor.fetchall()
+
+def get_by_topic(conn, topic):
+    cursor= conn.execute("""
+    SELECT * 
+    FROM problems
+    WHERE topic = ?
+    """, (topic,)) 
+    return cursor.fetchall()
+
 if __name__=="__main__":
     conn= get_connection()
     create_table(conn)
