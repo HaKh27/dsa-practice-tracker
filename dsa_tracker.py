@@ -257,99 +257,97 @@ def delete_problem(problems,name):
                 problems.remove(m)
 
     
+if __name__=="__main__":
+    try:
+        problems= load_problems("problems.json")
+    except FileNotFoundError: 
+        problems=[]
+    backfill_last_reviewed(problems)
 
-try:
-    problems= load_problems("problems.json")
-except FileNotFoundError: 
-    problems=[]
-backfill_last_reviewed(problems)
+    print("\nDS&A TRACKER: ")
+    print("=" * 40)
 
+    while True:
+        print("\n")
+        print("What would you like to do?")
+        print("1. Add a new problem?")
+        print("2. Search by topic")
+        print("3. View all problems?")
+        print("4. View problems needing review?")
+        print("5. Sort Problems by Difficulty: ")
+        print("6. Sort Problems by Name: ")
+        print("7. Change Topic name: ")
+        print("8. Change level of difficulty: ")
+        print("9. Print 3 of the Hardest Problems:")
+        print("10. Search a problem by name using substring:")
+        print("11. Mark a problem as reviewed: ")
+        print("12. Delete a problem?")
+        print("13. Quit?")
+        choice = input("Enter a number: ").strip()
 
-
-print("\nDS&A TRACKER: ")
-print("=" * 40)
-
-while True:
-    print("\n")
-    print("What would you like to do?")
-    print("1. Add a new problem?")
-    print("2. Search by topic")
-    print("3. View all problems?")
-    print("4. View problems needing review?")
-    print("5. Sort Problems by Difficulty: ")
-    print("6. Sort Problems by Name: ")
-    print("7. Change Topic name: ")
-    print("8. Change level of difficulty: ")
-    print("9. Print 3 of the Hardest Problems:")
-    print("10. Search a problem by name using substring:")
-    print("11. Mark a problem as reviewed: ")
-    print("12. Delete a problem?")
-    print("13. Quit?")
-    choice = input("Enter a number: ").strip()
-
-    if choice == "1":
-        name, topic, difficulty, hint = get_new_problem()
-        add_problem(problems, name, topic, difficulty, hint)
-        save_problems(problems, "problems.json")
-    elif choice == "2":
-        print("=" * 40)
-        partial= input("Enter partial Topic name: ").strip()
-        result = search_by_topic(problems, partial)
-        print_numbered(result)
-    elif choice == "3":
-        print("=" * 40)
-        print(print_table_v2(problems))
-    elif choice == "4":
-        print("=" * 40)
-        stale= needs_review_by_date(problems, 7)
-        print_table_v2(stale)
-         
-    elif choice == "5":
-        print("=" * 60)
-        sorted_problem=(merge_sort(problems)) 
-        print_table_v2(sorted_problem)
-    elif choice == "6":
-        print("=" * 60)
-        sorted_problem=(quicksort(problems)) 
-        print_table_v2(sorted_problem)
-    elif choice == "7":
-        name= input("Enter the problem name to edit: ").strip().title()
-        print("=" * 60)
-        edit_topic(problems,name)   
-        save_problems(problems, "problems.json")
-    elif choice == "8":
-        name= input("Enter the problem name to edit: ")
-        print("=" * 60)
-        edit_difficulty(problems,name)
-        save_problems(problems, "problems.json")
-
-    elif choice == "9":
-        print("=" * 60)
-        heap_p= heap(problems,3)
-        print_table_v2(heap_p)  
-    elif choice == "10":
-        print("=" * 60)
-        partial= input("Enter partial problem name: ").strip()
-        results= search_by_partial_name(problems,partial)
-        if not results:
-            print(f"No problems found matching '{partial}'.")
-        else:
-            print_numbered(results)
-    elif choice == "11":
-            print("=" * 60)
-            name= input("Enter a problem name that was reviewed today: ").strip()
-            mark_reviewed(problems,name)
-            print_table_v2(problems)
+        if choice == "1":
+            name, topic, difficulty, hint = get_new_problem()
+            add_problem(problems, name, topic, difficulty, hint)
             save_problems(problems, "problems.json")
-    elif choice == "12":
+        elif choice == "2":
+            print("=" * 40)
+            partial= input("Enter partial Topic name: ").strip()
+            result = search_by_topic(problems, partial)
+            print_numbered(result)
+        elif choice == "3":
+            print("=" * 40)
+            print(print_table_v2(problems))
+        elif choice == "4":
+            print("=" * 40)
+            stale= needs_review_by_date(problems, 7)
+            print_table_v2(stale)
+            
+        elif choice == "5":
             print("=" * 60)
-            name= input("Enter the name of the problem you'd like to delete: ").strip()
-            delete_problem(problems,name)
-            save_problems(problems,"problems.json")
-    elif choice == "13":
-        break
-    else: 
-        print("Invalid choice, try again")
+            sorted_problem=(merge_sort(problems)) 
+            print_table_v2(sorted_problem)
+        elif choice == "6":
+            print("=" * 60)
+            sorted_problem=(quicksort(problems)) 
+            print_table_v2(sorted_problem)
+        elif choice == "7":
+            name= input("Enter the problem name to edit: ").strip().title()
+            print("=" * 60)
+            edit_topic(problems,name)   
+            save_problems(problems, "problems.json")
+        elif choice == "8":
+            name= input("Enter the problem name to edit: ")
+            print("=" * 60)
+            edit_difficulty(problems,name)
+            save_problems(problems, "problems.json")
+
+        elif choice == "9":
+            print("=" * 60)
+            heap_p= heap(problems,3)
+            print_table_v2(heap_p)  
+        elif choice == "10":
+            print("=" * 60)
+            partial= input("Enter partial problem name: ").strip()
+            results= search_by_partial_name(problems,partial)
+            if not results:
+                print(f"No problems found matching '{partial}'.")
+            else:
+                print_numbered(results)
+        elif choice == "11":
+                print("=" * 60)
+                name= input("Enter a problem name that was reviewed today: ").strip()
+                mark_reviewed(problems,name)
+                print_table_v2(problems)
+                save_problems(problems, "problems.json")
+        elif choice == "12":
+                print("=" * 60)
+                name= input("Enter the name of the problem you'd like to delete: ").strip()
+                delete_problem(problems,name)
+                save_problems(problems,"problems.json")
+        elif choice == "13":
+            break
+        else: 
+            print("Invalid choice, try again")
 
 
 

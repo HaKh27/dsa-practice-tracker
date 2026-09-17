@@ -131,5 +131,12 @@
         "difficulty": "Medium",
         "need_hint": false,
         "last_reviewed": "2026-09-15"
+    },
+    {
+        "name": "Delete",
+        "topic": "Hash",
+        "difficulty": "Easy",
+        "need_hint": false,
+        "last_reviewed": "2026-09-16"
     }
 ]
