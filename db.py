@@ -1,5 +1,5 @@
 import sqlite3
-from dsa_tracker import load_problems
+from datetime import date
 
 def get_connection():
     return sqlite3.connect("tracker.db")
@@ -25,7 +25,7 @@ def create_table(conn):
     """)
     conn.commit()
 
-def insert_problems(conn,name,topic,difficulty,last_reviewed):
+def insert_problems(conn,name,topic,difficulty,last_reviewed=str(date.today())):
     conn.execute("""
         INSERT INTO problems(name,topic, difficulty,last_reviewed)
         VALUES(?,?,?,?)
@@ -45,6 +45,8 @@ def get_by_topic(conn, topic):
     return cursor.fetchall()
 
 def migrate_json_to_sql(conn):
+    from dsa_tracker import load_problems
+
     problems=load_problems(filename="problems.json")
 
     problem= get_all_problems(conn)

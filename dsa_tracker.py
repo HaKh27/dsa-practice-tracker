@@ -1,8 +1,11 @@
 from tabulate import tabulate
 from datetime import date
+from db import get_connection, insert_problems
+
 import json
 import random 
 import heapq
+
 
 def days_since(date_str):
     stored= date.fromisoformat(date_str)
@@ -258,6 +261,8 @@ def delete_problem(problems,name):
 
     
 if __name__=="__main__":
+    conn = get_connection()
+
     try:
         problems= load_problems("problems.json")
     except FileNotFoundError: 
@@ -287,8 +292,7 @@ if __name__=="__main__":
 
         if choice == "1":
             name, topic, difficulty, hint = get_new_problem()
-            add_problem(problems, name, topic, difficulty, hint)
-            save_problems(problems, "problems.json")
+            insert_problems(conn, name, topic, difficulty, last_reviewed= date.today())
         elif choice == "2":
             print("=" * 40)
             partial= input("Enter partial Topic name: ").strip()
