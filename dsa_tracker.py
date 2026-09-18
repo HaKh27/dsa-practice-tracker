@@ -1,6 +1,6 @@
 from tabulate import tabulate
 from datetime import date
-from db import get_connection, insert_problems
+from db import get_connection, insert_problems, get_all_problems
 
 import json
 import random 
@@ -300,7 +300,10 @@ if __name__=="__main__":
             print_numbered(result)
         elif choice == "3":
             print("=" * 40)
-            print(print_table_v2(problems))
+            rows= get_all_problems(conn) #raw tuples 
+            #convert the tuples to dict 
+            converted= [{"name":r[1], "topic":r[2], "difficulty":r[3], "last_reviewed": r[4]} for r in rows]
+            print(print_table_v2(converted))
         elif choice == "4":
             print("=" * 40)
             stale= needs_review_by_date(problems, 7)
@@ -355,36 +358,3 @@ if __name__=="__main__":
 
 
 
-
-"""
-add_new = input("Add a new problem? (y/n): ")
-if add_new.lower()=='y':
-    name, topic, difficulty, hint = get_new_problem()
-    add_problem(problems, name, topic, difficulty, hint)
-    save_problems(problems, "problems.json")
-
-print("=" * 40)
-search_prob = input("Search for a topic? (y/n): ")
-if search_prob.lower()=='y':
-    topic = get_search_problem()
-    result = search_by_topic(problems, topic)
-    print_numbered(result)
-
-print("=" * 40)
-print(f"Listing out problems: ")
-for i,problem in enumerate(problems): # new line because this function doesn't have a return. it prints within the function 
-    suffix = " - needs review" if problem["need_hint"] else ""
-    print(f"{i+1}. {problem['name']} ({problem['topic']}, {problem['difficulty']}{suffix})")
-
-
-print("=" * 40)
-print(f"counting by topics:\n{count_by_topic(problems)}")
-
-#print("=" * 40)
-#topic = "dynamic programming"
-#result= search_by_topic(problems, topic)
-#print(f"Searching for {topic} problem: ")
-#print_numbered(result)
-
-#print(f"problems needing review: {problems_needing_review(problems)}")
-"""
