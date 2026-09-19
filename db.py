@@ -40,8 +40,8 @@ def get_by_topic(conn, topic):
     cursor= conn.execute("""
     SELECT * 
     FROM problems
-    WHERE topic = ?
-    """, (topic,)) 
+    WHERE topic LIKE ?
+    """, ( '%' + topic + '%',)) 
     return cursor.fetchall()
 
 def migrate_json_to_sql(conn):

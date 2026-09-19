@@ -1,6 +1,6 @@
 from tabulate import tabulate
 from datetime import date
-from db import get_connection, insert_problems, get_all_problems
+from db import get_connection, insert_problems, get_all_problems, get_by_topic
 
 import json
 import random 
@@ -296,8 +296,9 @@ if __name__=="__main__":
         elif choice == "2":
             print("=" * 40)
             partial= input("Enter partial Topic name: ").strip()
-            result = search_by_topic(problems, partial)
-            print_numbered(result)
+            result = get_by_topic(conn, partial)
+            converted= [{"name":r[1],"topic":r[2], "difficulty":r[3]} for r in result]
+            print_numbered(converted)
         elif choice == "3":
             print("=" * 40)
             rows= get_all_problems(conn) #raw tuples 
