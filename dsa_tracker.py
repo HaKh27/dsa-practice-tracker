@@ -1,6 +1,6 @@
 from tabulate import tabulate
 from datetime import date
-from db import get_connection, insert_problems, get_all_problems, get_by_topic
+from db import get_connection, insert_problems, get_all_problems, get_by_topic, needs_review
 
 import json
 import random 
@@ -307,8 +307,9 @@ if __name__=="__main__":
             print(print_table_v2(converted))
         elif choice == "4":
             print("=" * 40)
-            stale= needs_review_by_date(problems, 7)
-            print_table_v2(stale)
+            stale= needs_review(conn)
+            converted= [{"name":s[1], "topic":s[2], "difficulty":s[3], "last_reviewed": s[4]} for s in stale]
+            print_table_v2(converted)
             
         elif choice == "5":
             print("=" * 60)

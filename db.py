@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import date
+from datetime import date, timedelta
 
 def get_connection():
     return sqlite3.connect("tracker.db")
@@ -59,6 +59,16 @@ def migrate_json_to_sql(conn):
                 break 
         if found==False:           
             insert_problems(conn,p["name"],p["topic"],p["difficulty"],p["last_reviewed"])
+
+def needs_review(conn):
+    cutoff= str(date.today()-timedelta(days=7))
+
+    cursor= conn.execute("""
+    SELECT * 
+    FROM problems 
+    WHERE last_reviewed < ? 
+    """, (cutoff,))
+    return cursor.fetchall()
 
 
 if __name__=="__main__":
