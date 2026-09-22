@@ -1,6 +1,6 @@
 from tabulate import tabulate
 from datetime import date
-from db import get_connection, insert_problems, get_all_problems, get_by_topic, needs_review
+from db import get_connection, insert_problems, get_all_problems, get_by_topic, needs_review, get_sorted_by_difficulty, get_sorted_by_name,edit_topic_sql, find_by_name_sql, edit_topic_by_id_sql
 
 import json
 import random 
@@ -259,7 +259,10 @@ def delete_problem(problems,name):
             if choice==i+1: 
                 problems.remove(m)
 
-    
+def convert_rows(rows):
+    result= [{"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in rows]
+    print_table_v2(result) 
+
 if __name__=="__main__":
     conn = get_connection()
 
@@ -297,8 +300,7 @@ if __name__=="__main__":
             print("=" * 40)
             partial= input("Enter partial Topic name: ").strip()
             result = get_by_topic(conn, partial)
-            converted= [{"name":r[1],"topic":r[2], "difficulty":r[3]} for r in result]
-            print_numbered(converted)
+            convert_rows(result)
         elif choice == "3":
             print("=" * 40)
             rows= get_all_problems(conn) #raw tuples 
@@ -308,21 +310,42 @@ if __name__=="__main__":
         elif choice == "4":
             print("=" * 40)
             stale= needs_review(conn)
-            converted= [{"name":s[1], "topic":s[2], "difficulty":s[3], "last_reviewed": s[4]} for s in stale]
-            print_table_v2(converted)
-            
+            convert_rows(stale)
         elif choice == "5":
             print("=" * 60)
-            sorted_problem=(merge_sort(problems)) 
-            print_table_v2(sorted_problem)
+            sorted_problem=get_sorted_by_difficulty(conn) 
+            convert_rows(sorted_problem)
+
         elif choice == "6":
             print("=" * 60)
-            sorted_problem=(quicksort(problems)) 
-            print_table_v2(sorted_problem)
+            sorted_problem=get_sorted_by_name(conn) 
+            convert_rows(sorted_problem)
         elif choice == "7":
             name= input("Enter the problem name to edit: ").strip().title()
             print("=" * 60)
-            edit_topic(problems,name)   
+            matches= find_by_name_sql(conn,name)
+
+            if len(matches)==0:
+                print("No problems found with that name.")
+            elif len(matches)==1:
+                new_topic= input("Enter a new topic name: ")
+                edit_topic_sql(conn, new_topic, name)
+            elif len(matches)>1:
+                convert_matches= [{"name":m[1], "topic":m[2], "difficulty":m[3], "last_reviewed":m[4]} for m in matches]
+                print_numbered(convert_matches)
+                c= input("Enter a number: ").strip() 
+                c= int(c)
+                for i,m in enumerate(matches):
+                    if c==i+1:
+                        new_topic= input("Enter a new topic name: ")
+                        edit_topic_by_id_sql(conn,new_topic, m[0])
+
+
+
+
+           
+            print("Topic Updated")
+                              
             save_problems(problems, "problems.json")
         elif choice == "8":
             name= input("Enter the problem name to edit: ")

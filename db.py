@@ -70,6 +70,54 @@ def needs_review(conn):
     """, (cutoff,))
     return cursor.fetchall()
 
+def get_sorted_by_difficulty(conn):
+    cursor= conn.execute("""
+    SELECT * 
+    FROM problems
+    ORDER BY 
+        CASE difficulty
+            WHEN 'Easy' THEN 3
+            WHEN 'Medium' THEN 2 
+            WHEN 'Hard' THEN 1
+        END
+    """)
+    return cursor.fetchall()
+
+def edit_topic_sql(conn,new_topic,name):
+    conn.execute(""" 
+    UPDATE problems 
+    SET topic=?
+    WHERE name LIKE ?
+
+    """, (new_topic, name,))
+    conn.commit()
+
+def find_by_name_sql(conn, name):
+    cursor= conn.execute("""
+    SELECT * 
+    FROM problems 
+    WHERE name LIKE ? 
+    """, (name,))
+    return cursor.fetchall()
+
+def edit_topic_by_id_sql(conn, new_topic, id):
+    conn.execute(""" 
+    UPDATE problems 
+    SET topic=?
+    WHERE id= ?
+    
+    """, (new_topic, id,))
+    conn.commit()
+
+def get_sorted_by_name(conn):
+    cursor= conn.execute("""
+    SELECT * 
+    FROM problems 
+    ORDER BY name asc 
+    """)
+    return cursor.fetchall()
+
+
 
 if __name__=="__main__":
     conn= get_connection()
