@@ -92,12 +92,23 @@ def edit_topic_sql(conn,new_topic,name):
     """, (new_topic, name,))
     conn.commit()
 
+
+def edit_difficulty_sql(conn,new_rank,name):
+    conn.execute(""" 
+    UPDATE problems 
+    SET difficulty=?
+    WHERE name LIKE ?
+
+    """, (new_rank, name,))
+    conn.commit()
+
+
 def find_by_name_sql(conn, name):
     cursor= conn.execute("""
     SELECT * 
     FROM problems 
     WHERE name LIKE ? 
-    """, (name,))
+    """, ('%'+ name+ '%',))
     return cursor.fetchall()
 
 def edit_topic_by_id_sql(conn, new_topic, id):
@@ -108,6 +119,16 @@ def edit_topic_by_id_sql(conn, new_topic, id):
     
     """, (new_topic, id,))
     conn.commit()
+
+def edit_difficulty_by_id_sql(conn, new_rank, id):
+    conn.execute("""
+    UPDATE problems
+    SET difficulty=?
+    WHERE id=?
+    
+    """,(new_rank,id,))
+    conn.commit()
+
 
 def get_sorted_by_name(conn):
     cursor= conn.execute("""

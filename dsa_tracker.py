@@ -1,6 +1,6 @@
 from tabulate import tabulate
 from datetime import date
-from db import get_connection, insert_problems, get_all_problems, get_by_topic, needs_review, get_sorted_by_difficulty, get_sorted_by_name,edit_topic_sql, find_by_name_sql, edit_topic_by_id_sql
+from db import get_connection, insert_problems, get_all_problems, get_by_topic, needs_review, get_sorted_by_difficulty, get_sorted_by_name,edit_topic_sql, find_by_name_sql, edit_topic_by_id_sql,edit_difficulty_by_id_sql, edit_difficulty_sql
 
 import json
 import random 
@@ -328,7 +328,7 @@ if __name__=="__main__":
             if len(matches)==0:
                 print("No problems found with that name.")
             elif len(matches)==1:
-                new_topic= input("Enter a new topic name: ")
+                new_topic= input("Enter a new topic name: ").strip().title()
                 edit_topic_sql(conn, new_topic, name)
             elif len(matches)>1:
                 convert_matches= [{"name":m[1], "topic":m[2], "difficulty":m[3], "last_reviewed":m[4]} for m in matches]
@@ -337,21 +337,32 @@ if __name__=="__main__":
                 c= int(c)
                 for i,m in enumerate(matches):
                     if c==i+1:
-                        new_topic= input("Enter a new topic name: ")
+                        new_topic= input("Enter a new topic name: ").strip().title()
                         edit_topic_by_id_sql(conn,new_topic, m[0])
-
-
-
-
-           
             print("Topic Updated")
                               
             save_problems(problems, "problems.json")
         elif choice == "8":
-            name= input("Enter the problem name to edit: ")
+            name= input("Enter the problem name to edit its difficulty: ").strip().title()
             print("=" * 60)
-            edit_difficulty(problems,name)
-            save_problems(problems, "problems.json")
+            matches= find_by_name_sql(conn,name)
+            
+            if len(matches)==0:
+                print("No problems found with that name.")
+            elif len(matches)==1:
+                new_rank= input("Enter a new difficulty rank: ").strip().title()
+                edit_difficulty_sql(conn, new_rank, name)
+                print("Difficulty Updated")
+            elif len(matches)>1:
+                convert_matches= [{"name":m[1], "topic":m[2], "difficulty":m[3], "last_reviewed":m[4]} for m in matches]
+                print_numbered(convert_matches)
+                c= input("Enter a number: ").strip() 
+                c= int(c)
+                for i,m in enumerate(matches):
+                    if c==i+1:
+                        new_rank= input("Enter a new difficulty rank: ").strip().title()
+                        edit_difficulty_by_id_sql(conn,new_rank, m[0])
+                        print("Difficulty Updated")        
 
         elif choice == "9":
             print("=" * 60)
