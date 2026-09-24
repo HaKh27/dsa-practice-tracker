@@ -139,6 +139,19 @@ def get_sorted_by_name(conn):
     return cursor.fetchall()
 
 
+def return_top_3_hardest_problems(conn):
+    cursor= conn.execute("""
+    SELECT * 
+    FROM problems 
+    ORDER BY
+        CASE difficulty 
+            WHEN 'Hard' THEN 1
+            WHEN 'Medium' THEN 2
+            WHEN 'Easy' THEN 3 
+        END
+        LIMIT  3;
+    """)
+    return cursor.fetchall()
 
 if __name__=="__main__":
     conn= get_connection()

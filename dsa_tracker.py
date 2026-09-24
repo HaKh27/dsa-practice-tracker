@@ -1,6 +1,6 @@
 from tabulate import tabulate
 from datetime import date
-from db import get_connection, insert_problems, get_all_problems, get_by_topic, needs_review, get_sorted_by_difficulty, get_sorted_by_name,edit_topic_sql, find_by_name_sql, edit_topic_by_id_sql,edit_difficulty_by_id_sql, edit_difficulty_sql
+from db import get_connection, insert_problems, get_all_problems, get_by_topic, needs_review, get_sorted_by_difficulty, get_sorted_by_name,edit_topic_sql, find_by_name_sql, edit_topic_by_id_sql,edit_difficulty_by_id_sql, edit_difficulty_sql, return_top_3_hardest_problems
 
 import json
 import random 
@@ -366,16 +366,17 @@ if __name__=="__main__":
 
         elif choice == "9":
             print("=" * 60)
-            heap_p= heap(problems,3)
-            print_table_v2(heap_p)  
+            result= return_top_3_hardest_problems(conn)
+            convert_rows(result)
+            #print_table_v2(heap_p)  
         elif choice == "10":
             print("=" * 60)
             partial= input("Enter partial problem name: ").strip()
-            results= search_by_partial_name(problems,partial)
+            results= find_by_name_sql(conn,partial)
             if not results:
                 print(f"No problems found matching '{partial}'.")
             else:
-                print_numbered(results)
+                convert_rows(results)
         elif choice == "11":
                 print("=" * 60)
                 name= input("Enter a problem name that was reviewed today: ").strip()
