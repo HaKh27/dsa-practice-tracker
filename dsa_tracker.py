@@ -1,47 +1,6 @@
 from tabulate import tabulate
 from datetime import date
-from db import get_connection, insert_problems, get_all_problems, get_by_topic, needs_review, get_sorted_by_difficulty, get_sorted_by_name,edit_topic_sql, find_by_name_sql, edit_topic_by_id_sql,edit_difficulty_by_id_sql, edit_difficulty_sql, return_top_3_hardest_problems
-
-import json
-import random 
-import heapq
-
-
-def days_since(date_str):
-    stored= date.fromisoformat(date_str)
-    days_ago= (date.today()-stored).days
-
-    return days_ago 
-
-def save_problems(problems, filename="problems.json"):
-     with open(filename,"w") as f:
-        json.dump(problems,f, indent =4)
-
-def load_problems(filename="problems.json"):
-    with open(filename, "r") as f:
-        return json.load(f)
-
-def needs_review_by_date(problems,threshold_days):
-    result= []
-    for p in problems: 
-        if days_since(p["last_reviewed"])>= threshold_days:
-            result.append(p)
-
-    return result
-
-def backfill_last_reviewed(problems):
-    for p in problems: 
-        if "last_reviewed" not in p: 
-            p["last_reviewed"]= str(date.today())
-
-def add_problem(problems, name, topic, difficulty, needed_hint):
-    problems.append({
-        "name":name, 
-        "topic": topic, 
-        "difficulty": difficulty, 
-        "need_hint": needed_hint, 
-        "last_reviewed": str(date.today())
-        })
+from db import get_connection, insert_problems, get_all_problems, get_by_topic, needs_review, get_sorted_by_difficulty, get_sorted_by_name,edit_topic_sql, find_by_name_sql, edit_topic_by_id_sql,edit_difficulty_by_id_sql, edit_difficulty_sql, return_top_3_hardest_problems,edit_last_reviewed, edit_last_reviewed_by_name, delete_problem_by_name_sql, delete_problem_sql
 
 def get_new_problem():
     name = input("Enter problem name: ").strip().title()
@@ -52,35 +11,6 @@ def get_new_problem():
 
     return name,topic, difficulty,needed_hint
 
-def count_by_topic(problems): 
-    count = {}
-    for problem in problems: 
-        topic = problem["topic"] #topic is one of the keys from problems dict 
-        count[topic]= count.get(topic,0)+1
-    
-    return count 
-    
-def problems_needing_review(problems):
-    matches = [p for p in problems if p["need_hint"]]
-    line = []
-    for i, problem in enumerate(matches):
-        if problem["need_hint"]==True:
-            result = f'{i+1}. {problem["name"]}'
-            line.append(result)
-          
-            
-    return "\n".join(line)
- 
-
-def print_problems(problems):
-    lines=[]
-    for i, p in enumerate(problems): 
-            result= f'{i+1}. {p["name"]} ({p["topic"]}, {p["difficulty"]})' 
-            if p["need_hint"] == True:
-                result+= " - needs review"
-            lines.append(result)
-    return "\n".join(lines)
-
 def print_table_v2(problems):
     rows= []
     headers= ["Name", "Topic", "Difficulty", "Last Reviewed"]
@@ -88,189 +18,19 @@ def print_table_v2(problems):
         rows.append([p["name"], p["topic"], p["difficulty"], p["last_reviewed"]])
     print(tabulate(rows,headers=headers, tablefmt= "grid", showindex=range(1, len(rows)+1)))
 
-def print_table(problems):
-    lines= [f"{'':<4}{'Name':<27}{'Topic':21}{'Difficulty':<13}"]
-    for i,p in enumerate(problems):
-        lines.append(f'{str(i+1)+".":<4}{p["name"]:<25}  {p["topic"]:<20} {p["difficulty"]:<12}')
-    return "\n".join(lines)
-
 def print_numbered(problems):
     for i,problem in enumerate(problems):
         print(f"{i+1}. {problem['name']}: ({problem['topic']}, {problem['difficulty']})")
-
-def get_search_problem():
-    topic = input("Enter topic name: ").strip().title()
-
-    return topic
-"""""
-def search_by_topic(problems, topic):
-    result = []
-    topic = topic.title()
-
-    for problem in problems: 
-        if problem["topic"]== topic:
-            result.append(problem)
-
-
-    if not result: 
-        print(f"{topic}: Topic Not Found")
-
-    return result 
-"""
-
-def search_by_topic(problems, partial):
-    result=[]
-
-    for problem in problems: 
-        if partial.lower() in problem["topic"].lower(): 
-            result.append(problem)
-
-    if not result: 
-        print(f"{partial} not found")
-
-    return result 
-
-def merge_sort(problems):
-    if len(problems)<=1:
-        return problems
-    mid = len(problems)//2
-    left = merge_sort(problems[:mid])
-    right = merge_sort(problems[mid:])
-
-    return merge(left,right)
-
-def merge(left,right):
-    result=[]
-    i,j= 0,0
-    difficult_rank={"Hard":0, "Medium":1, "Easy":2}
-    while i <len(left) and j<len(right): 
-        if difficult_rank[left[i]["difficulty"]]< difficult_rank[right[j]["difficulty"]]:
-            result.append(left[i])
-            i+=1
-        else:
-            result.append(right[j])
-            j+=1 
-    
-    result.extend(left[i:])
-    result.extend(right[j:])
-    return result 
-
-def quicksort(problems):
-    if len(problems)<=1:
-        return problems
-
-    pivot_index= random.randint(0,len(problems)-1)
-    pivot = problems[pivot_index]
-    remaining = problems[:pivot_index]+ problems[pivot_index+1:]
-
-    left= [p for p in remaining if p["name"]<pivot["name"]]
-    right= [p for p in remaining if p["name"]>pivot["name"]]
-
-    return quicksort(left)+ [pivot]+quicksort(right)
-
-def find_by_name(problems, name):
-    return [p for p in problems if name.lower() in p["name"].lower()]
-
-def edit_topic(problems,name):
-    matches= find_by_name(problems, name)
-    if len(matches)==0:
-        print("No Problem found with that name.")
-        return
-    elif len(matches)==1: 
-        new_topic = input("Enter new topic: ")
-        matches[0]["topic"]= new_topic.strip().title()
-    elif len(matches)>1: 
-        print_numbered(matches)
-        choice = input("Enter a number: ").strip()
-        choice = int(choice)
-        for i, m in enumerate(matches): 
-            if choice == i+1: 
-                new_topic = input("Enter new topic: ")
-                m["topic"]= new_topic.strip().title()
-
-
-def edit_difficulty(problems, name):
-    matches= find_by_name(problems,name)
-    if len(matches)==0: 
-        print("No problem found with that name.")
-        return
-    elif len(matches)==1:
-        new_rank= input("Enter new level of difficulty: ")
-        matches[0]["difficulty"]= new_rank.strip().title()
-    elif len(matches)>1:
-        print_numbered(matches)
-        choice = input("Enter a number").strip()
-        choice = int(choice)
-        for i,m in enumerate(matches):
-            if choice == i+1:
-                new_rank= input("Enter new level of difficulty: ")
-                m["difficulty"]=new_rank.strip().title()
-                
-def heap(problems,k):
-    rank = {"Hard":0, "Medium":1, "Easy":2}
-    
-    heap_data=[]
-    for i, p in enumerate(problems): 
-        heap_data.append((rank[p["difficulty"]],i ,p))
-    heapq.heapify(heap_data)
-    
-    result=[]
-    for _ in range(k):
-        rank_val,index, problem = heapq.heappop(heap_data)
-        result.append(problem)
-    return result 
-
-def search_by_partial_name(problems,partial):
-    matches=[]
-    for p in problems: 
-        if partial.lower() in p["name"].lower():
-            matches.append(p)
-
-    return matches 
-
-def mark_reviewed(problems,name):
-    matches= find_by_name(problems,name)
-    if len(matches)==0:
-        print(f"No problem found with that {name}.")
-        return
-    elif len(matches)==1: 
-        print_numbered(matches)
-        matches[0]["last_reviewed"]=str(date.today())
-    elif len(matches)>=2:
-        print_numbered(matches)
-        choice= input("Please choose a problem to mark as reviewed: ").strip()
-        choice= int(choice)
-        for i,m in enumerate(matches):
-            if choice==i+1:
-                m["last_reviewed"]=str(date.today())
-            
-def delete_problem(problems,name):
-    matches= find_by_name(problems,name)
-    if len(matches)==0:
-        print(f"No problem found with that {name}.")
-        return 
-    elif len(matches)==1: 
-        problems.remove(matches[0])
-    elif len(matches)>=2:
-        print_numbered(matches)
-        choice=input("Select the problem you'd like to remove: ").strip()
-        choice=int(choice)
-        for i,m in enumerate(matches):
-            if choice==i+1: 
-                problems.remove(m)
 
 def convert_rows(rows):
     result= [{"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in rows]
     print_table_v2(result) 
 
+
+
 if __name__=="__main__":
     conn = get_connection()
 
-    try:
-        problems= load_problems("problems.json")
-    except FileNotFoundError: 
-        problems=[]
-    backfill_last_reviewed(problems)
 
     print("\nDS&A TRACKER: ")
     print("=" * 40)
@@ -295,7 +55,7 @@ if __name__=="__main__":
 
         if choice == "1":
             name, topic, difficulty, hint = get_new_problem()
-            insert_problems(conn, name, topic, difficulty, last_reviewed= date.today())
+            insert_problems(conn, name, topic, difficulty, last_reviewed= str(date.today()))
         elif choice == "2":
             print("=" * 40)
             partial= input("Enter partial Topic name: ").strip()
@@ -306,7 +66,7 @@ if __name__=="__main__":
             rows= get_all_problems(conn) #raw tuples 
             #convert the tuples to dict 
             converted= [{"name":r[1], "topic":r[2], "difficulty":r[3], "last_reviewed": r[4]} for r in rows]
-            print(print_table_v2(converted))
+            print_table_v2(converted)
         elif choice == "4":
             print("=" * 40)
             stale= needs_review(conn)
@@ -340,8 +100,7 @@ if __name__=="__main__":
                         new_topic= input("Enter a new topic name: ").strip().title()
                         edit_topic_by_id_sql(conn,new_topic, m[0])
             print("Topic Updated")
-                              
-            save_problems(problems, "problems.json")
+          
         elif choice == "8":
             name= input("Enter the problem name to edit its difficulty: ").strip().title()
             print("=" * 60)
@@ -368,7 +127,6 @@ if __name__=="__main__":
             print("=" * 60)
             result= return_top_3_hardest_problems(conn)
             convert_rows(result)
-            #print_table_v2(heap_p)  
         elif choice == "10":
             print("=" * 60)
             partial= input("Enter partial problem name: ").strip()
@@ -378,16 +136,44 @@ if __name__=="__main__":
             else:
                 convert_rows(results)
         elif choice == "11":
-                print("=" * 60)
-                name= input("Enter a problem name that was reviewed today: ").strip()
-                mark_reviewed(problems,name)
-                print_table_v2(problems)
-                save_problems(problems, "problems.json")
+            print("=" * 60)
+            name= input("Enter the problem name to update its last reviewed date: ").strip().title()
+            matches= find_by_name_sql(conn,name)        
+            if len(matches)==0:
+                print("No problems found with that name.")
+            elif len(matches)==1:
+                new_date= str(date.today())
+                edit_last_reviewed_by_name(conn, new_date, name)
+                print("Date Updated")
+            elif len(matches)>1:
+                convert_matches= [{"name":m[1], "topic":m[2], "difficulty":m[3], "last_reviewed":m[4]} for m in matches]
+                print_numbered(convert_matches)
+                c= input("Enter a number: ").strip() 
+                c= int(c)
+                for i,m in enumerate(matches):
+                    if c==i+1:
+                        new_date= str(date.today())
+                        edit_last_reviewed(conn,new_date, m[0])
+                        print("Date Updated")   
         elif choice == "12":
-                print("=" * 60)
-                name= input("Enter the name of the problem you'd like to delete: ").strip()
-                delete_problem(problems,name)
-                save_problems(problems,"problems.json")
+            print("=" * 60)
+            name= input("Enter the name of the problem you'd like to delete: ").strip().title()
+            matches= find_by_name_sql(conn,name)        
+            if len(matches)==0:
+                print("No problems found with that name.")
+            elif len(matches)==1:
+                delete_problem_by_name_sql(conn, name)
+                print(f"{name} Deleted")
+            elif len(matches)>1:
+                convert_matches= [{"name":m[1], "topic":m[2], "difficulty":m[3], "last_reviewed":m[4]} for m in matches]
+                print_numbered(convert_matches)
+                c= input("Choose which problem to delete by number: ").strip() 
+                c= int(c)
+                for i,m in enumerate(matches):
+                    if c==i+1:
+                        delete_problem_sql(conn, m[0])
+                        print(f"{m[1]} Deleted") 
+            
         elif choice == "13":
             break
         else: 

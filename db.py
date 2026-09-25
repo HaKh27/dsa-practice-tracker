@@ -93,6 +93,24 @@ def edit_topic_sql(conn,new_topic,name):
     conn.commit()
 
 
+def edit_last_reviewed(conn, last_reviewed,id ):
+    conn.execute("""
+    UPDATE problems 
+    SET last_reviewed=?
+    WHERE id=? 
+    
+    """,(last_reviewed,id,))
+    conn.commit()
+
+def edit_last_reviewed_by_name(conn,last_reviewed,name):
+    conn.execute("""
+    UPDATE problems 
+    SET last_reviewed=?
+    WHERE name LIKE ? 
+    """, (last_reviewed, name,))
+    conn.commit()
+
+
 def edit_difficulty_sql(conn,new_rank,name):
     conn.execute(""" 
     UPDATE problems 
@@ -152,6 +170,23 @@ def return_top_3_hardest_problems(conn):
         LIMIT  3;
     """)
     return cursor.fetchall()
+
+def delete_problem_sql(conn, id):
+    conn.execute("""
+    DELETE FROM problems 
+    WHERE id = ? 
+     """, (id,))
+
+    conn.commit()
+
+def delete_problem_by_name_sql(conn, name):
+    conn.execute("""
+    DELETE FROM problems 
+    WHERE name LIKE ? 
+     """, (name,))
+
+    conn.commit()
+
 
 if __name__=="__main__":
     conn= get_connection()
