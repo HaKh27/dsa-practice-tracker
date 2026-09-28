@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Structures and Algorithms Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>DS&A Tracker</h1>
+    <form>
+        <p>Add a new problem: </p>
+        <label for ="name">Problem Name: </label>
+        <input type="text" id="name" name="name">
+
+        <label for="topic">Topic: </label>
+        <input type="text" id="topic" name="topic">
+
+        <label for="difficulty">Difficulty: </label>
+        <select id="difficulty" name="difficulty">
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value = "Hard">Hard</option>
+        </select>
+
+        <input type="checkbox" id="needsHint" name="needsHint">
+        <label for="needsHint">Needed a hint? </label>
+        
+        <button type="submit">Add Problem</button>
+
+    </form>
+
+    <table>
+        <tr>
+            <th>Problem Name</th>
+            <th>Topic</th>
+            <th>Difficulty</th>
+            <th>Last Reviewed</th>
+        </tr>
+        <tr>
+            <td>Knapsack</td>
+            <td>Dynamic Programming</td>    
+            <td>Medium</td>
+            <td>2026-09-14</td>
+        </tr>
+        <tr>
+            <td>Islands</td>
+            <td>Graph</td>    
+            <td>Medium</td>
+            <td>2026-09-15</td>
+        </tr>
+        <tr>
+            <td>LCS</td>
+            <td>Dynammic Programming</td>    
+            <td>Medium</td>
+            <td>2026-08-30</td>
+        </tr>
+    </table>
+</body>
+
+
+
+</html>

@@ -1,0 +1,23 @@
+h1{
+    color:brown;
+    padding: 1px;
+
+}
+
+td {
+    padding:8px;
+    border:1px solid black;
+
+}
+
+#name{
+    color:brown;
+    padding: 5px;
+
+
+}
+
+th{
+    padding:8px;
+    background-color: lightgrey; 
+}
