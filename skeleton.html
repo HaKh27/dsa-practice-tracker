@@ -54,6 +54,30 @@
             <td>2026-08-30</td>
         </tr>
     </table>
+    <script>
+        const button= document.querySelector("button")
+        const nameInput=document.getElementById("name");
+        const topicInput= document.getElementById("topic");
+        const difficultyInput= document.getElementById("difficulty");
+        const neededHint=document.getElementById("needsHint")
+
+    
+
+        button.addEventListener("click", function(event){
+            event.preventDefault();
+            fetch("/add-problem",{
+                method: "POST",
+                headers:{"Content-Type": "application/json"},
+                body: JSON.stringify({name:nameInput.value,topic: topicInput.value, difficulty:difficultyInput.value, hint:neededHint.checked })
+
+            })
+            .then(response => response.json())
+            .then(data=>console.log(data));
+
+            //console.log(nameInput.value, topicInput.value, difficultyInput.value, neededHint.checked)
+
+        });
+    </script>
 </body>
 
 
