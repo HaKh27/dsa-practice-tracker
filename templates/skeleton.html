@@ -25,8 +25,9 @@
         <label for="needsHint">Needed a hint? </label>
         
         <button type="submit">Add Problem</button>
-
     </form>
+    
+    <button type="button" id="reviewButton">See Problems Needing Review</button>
 
     <table>
         <tr>
@@ -43,8 +44,30 @@
         const topicInput= document.getElementById("topic");
         const difficultyInput= document.getElementById("difficulty");
         const neededHint=document.getElementById("needsHint")
+        const reviewButton=document.getElementById("reviewButton")
+        
+        reviewButton.addEventListener("click", function(event){
+            event.preventDefault();
+            fetch("/get-needs-review")
+            .then(response=> response.json())
+            .then(data=> {
+                const table= document.querySelector("table")
+                table.innerHTML= `<tr>
+                    <th>Problem Name</th>
+                    <th>Topic</th>
+                    <th>Difficulty</th>
+                    <th>Last Reviewed</th>
+                </tr>`
 
-    
+                for (const problem of data) {
+                    const newRow= document.createElement("tr")
+                    newRow.innerHTML= `<td>${problem.name}</td><td> ${problem.topic}</td><td>${problem.difficulty}</td><td>${problem.last_reviewed}</td>`
+                    table.appendChild(newRow)
+                 
+                }
+            })
+
+        });
 
         button.addEventListener("click", function(event){
             event.preventDefault();

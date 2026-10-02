@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from db import get_connection,insert_problems, get_all_problems
+from db import get_connection,insert_problems, get_all_problems, needs_review
 from datetime import date 
 from dsa_tracker import convert_rows
 
@@ -30,6 +30,12 @@ def get_problems():
 
     return jsonify(data)
 
+@app.route("/get-needs-review", methods=["GET"])
+def get_needs_review():
+    conn=get_connection()
+    result= needs_review(conn)
+    data = [{"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
+    return jsonify(data)
 
 if __name__=="__main__":
     app.run(debug=True)  # starts the dev server, auto-reloads on code changes
