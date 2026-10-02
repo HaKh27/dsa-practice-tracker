@@ -35,24 +35,7 @@
             <th>Difficulty</th>
             <th>Last Reviewed</th>
         </tr>
-        <tr>
-            <td>Knapsack</td>
-            <td>Dynamic Programming</td>    
-            <td>Medium</td>
-            <td>2026-09-14</td>
-        </tr>
-        <tr>
-            <td>Islands</td>
-            <td>Graph</td>    
-            <td>Medium</td>
-            <td>2026-09-15</td>
-        </tr>
-        <tr>
-            <td>LCS</td>
-            <td>Dynammic Programming</td>    
-            <td>Medium</td>
-            <td>2026-08-30</td>
-        </tr>
+        
     </table>
     <script>
         const button= document.querySelector("button")
@@ -70,13 +53,32 @@
                 headers:{"Content-Type": "application/json"},
                 body: JSON.stringify({name:nameInput.value,topic: topicInput.value, difficulty:difficultyInput.value, hint:neededHint.checked })
 
+
             })
             .then(response => response.json())
-            .then(data=>console.log(data));
+            .then(data=>console.log(data))
+            .then(loadProblems)
+            .then(()=> {nameInput.value="";topicInput.value= ""; difficultyInput.value="";neededHint.checked= false });
 
             //console.log(nameInput.value, topicInput.value, difficultyInput.value, neededHint.checked)
-
+           
         });
+        function loadProblems(){
+            fetch("/get-problems")
+            .then(response=> response.json())
+            .then(data=> {
+                const table= document.querySelector("table")
+                for (const problem of data) {
+                    const newRow= document.createElement("tr")
+                    newRow.innerHTML= `<td>${problem.name}</td><td> ${problem.topic}</td><td>${problem.difficulty}</td><td>${problem.last_reviewed}</td>`
+                    table.appendChild(newRow)
+                 
+                }
+            })
+
+        }
+        loadProblems()
+        
     </script>
 </body>
 
