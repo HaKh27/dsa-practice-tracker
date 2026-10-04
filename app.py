@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql
+from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql
 from datetime import date 
 from dsa_tracker import convert_rows
 
@@ -46,7 +46,15 @@ def delete_problem():
     delete_problem_sql(conn,id)
     return jsonify({"message": "Problem delete succesfully"})# send a JSON response back
 
+@app.route("/edit-topic", methods=["PUT"])
+def edit_topic():
+    data=request.get_json()
+    topic=data["topic"]
+    id=data["id"]
 
+    conn=get_connection()
+    edit_topic_by_id_sql(conn,topic,id)
+    return jsonify({"message":"Topic updated"})
     
 
 if __name__=="__main__":

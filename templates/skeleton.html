@@ -127,8 +127,27 @@
                     });
 
                     actionsCell.appendChild(deleteBttn)
-                    newRow.appendChild(actionsCell)
                     
+                    const editBttn= document.createElement("button");
+                    editBttn.textContent="Edit Topic";
+                    editBttn.addEventListener("click", function(event){
+                        event.preventDefault();
+                        const newTopic= prompt("Enter new topic:");
+                        if (newTopic){
+                            fetch("/edit-topic", {
+                                method: "PUT",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ topic: newTopic, id: problem.id })
+                            })
+                        .then(response=> response.json())
+                        .then(data=> {
+                            console.log(data)
+                            loadProblems(); // refresh the table after a successful delete
+                    })};
+                    });
+
+                    actionsCell.appendChild(editBttn)
+                    newRow.appendChild(actionsCell)
                     table.appendChild(newRow)
                                      
                 }
