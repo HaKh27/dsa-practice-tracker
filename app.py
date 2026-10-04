@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from db import get_connection,insert_problems, get_all_problems, needs_review
+from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql
 from datetime import date 
 from dsa_tracker import convert_rows
 
@@ -26,7 +26,7 @@ def add_problem():
 def get_problems():
     conn=get_connection()
     result= get_all_problems(conn)
-    data = [{"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
+    data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
 
     return jsonify(data)
 
@@ -34,8 +34,20 @@ def get_problems():
 def get_needs_review():
     conn=get_connection()
     result= needs_review(conn)
-    data = [{"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
+    data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
     return jsonify(data)
+
+@app.route("/delete-problem", methods=["POST"])
+def delete_problem():
+    data=request.get_json()
+    id=data["id"]
+
+    conn=get_connection()
+    delete_problem_sql(conn,id)
+    return jsonify({"message": "Problem delete succesfully"})# send a JSON response back
+
+
+    
 
 if __name__=="__main__":
     app.run(debug=True)  # starts the dev server, auto-reloads on code changes

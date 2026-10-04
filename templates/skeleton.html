@@ -35,6 +35,7 @@
             <th>Topic</th>
             <th>Difficulty</th>
             <th>Last Reviewed</th>
+            <th>Action</th>
         </tr>
         
     </table>
@@ -87,18 +88,51 @@
            
         });
         function loadProblems(){
+            // fetch all problems from the backend
+
             fetch("/get-problems")
             .then(response=> response.json())
             .then(data=> {
                 const table= document.querySelector("table")
+                table.innerHTML= 
+                `<tr>
+                    <th>Problem Name</th>
+                    <th>Topic</th>
+                    <th>Difficulty</th>
+                    <th>Last Reviewed</th>
+                    <th>Action</th>
+                </tr>`
+                // build one table row per problem
                 for (const problem of data) {
                     const newRow= document.createElement("tr")
+                    // fill the first four cells with the problem's data
                     newRow.innerHTML= `<td>${problem.name}</td><td> ${problem.topic}</td><td>${problem.difficulty}</td><td>${problem.last_reviewed}</td>`
-                    table.appendChild(newRow)
-                 
-                }
-            })
+                    // build the "actions" cell separately so the button can have its own click listener
+                    const actionsCell=document.createElement("td")
+                    const deleteBttn=document.createElement("button");
+                    deleteBttn.textContent= "Delete"
+                    // when clicked, send this problem's id to Flask to delete it, then refresh the table
+                    deleteBttn.addEventListener("click", function(event){
+                        event.preventDefault();
+                        fetch("/delete-problem", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ id: problem.id })
+                        })
+                        .then(response=> response.json())
+                        .then(data=> {
+                            console.log(data)
+                            loadProblems(); // refresh the table after a successful delete
+                    });
+                    });
 
+                    actionsCell.appendChild(deleteBttn)
+                    newRow.appendChild(actionsCell)
+                    
+                    table.appendChild(newRow)
+                                     
+                }
+            })      
         }
         loadProblems()
         
