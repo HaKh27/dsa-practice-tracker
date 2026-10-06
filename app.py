@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql
+from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql, get_by_topic,find_by_name_sql
 from datetime import date 
 from dsa_tracker import convert_rows
 
@@ -55,7 +55,22 @@ def edit_topic():
     conn=get_connection()
     edit_topic_by_id_sql(conn,topic,id)
     return jsonify({"message":"Topic updated"})
-    
+
+@app.route("/search-by-name",methods=["GET"])
+def search_by_name():
+    conn=get_connection()
+    partial=request.args.get("partial")
+    result= find_by_name_sql(conn,partial)
+    data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
+    return jsonify(data)
+
+@app.route("/search-by-topic", methods=["GET"])
+def search_by_topic():
+    conn= get_connection()
+    topic=request.args.get("partial")
+    result= get_by_topic(conn,topic)
+    data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
+    return jsonify(data)
 
 if __name__=="__main__":
     app.run(debug=True)  # starts the dev server, auto-reloads on code changes

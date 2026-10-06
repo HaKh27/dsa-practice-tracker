@@ -28,6 +28,10 @@
     </form>
     
     <button type="button" id="reviewButton">See Problems Needing Review</button>
+    <input type="text" id="searchTopic" name="searchTopic">
+    <button type="button" id="searchByTopic">Search by Topic</button>
+    <input type="text" id="searchName" name="searchName">
+    <button type="button" id="searchByName">Search by Name</button>
 
     <table>
         <tr>
@@ -46,6 +50,10 @@
         const difficultyInput= document.getElementById("difficulty");
         const neededHint=document.getElementById("needsHint")
         const reviewButton=document.getElementById("reviewButton")
+        const searchTopicBttn= document.getElementById("searchByTopic")
+        const searchNameBttn= document.getElementById("searchByName")
+        const searchTopicInput=document.getElementById("searchTopic")
+        const searchNameInput=document.getElementById("searchName")
         
         reviewButton.addEventListener("click", function(event){
             event.preventDefault();
@@ -58,17 +66,54 @@
                     <th>Topic</th>
                     <th>Difficulty</th>
                     <th>Last Reviewed</th>
+                    <th>Action</th>
                 </tr>`
 
                 for (const problem of data) {
-                    const newRow= document.createElement("tr")
-                    newRow.innerHTML= `<td>${problem.name}</td><td> ${problem.topic}</td><td>${problem.difficulty}</td><td>${problem.last_reviewed}</td>`
-                    table.appendChild(newRow)
+                    buildRow(problem,table);
                  
                 }
             })
 
         });
+
+        searchTopicBttn.addEventListener("click", function(event){
+            event.preventDefault();
+            fetch("/search-by-topic?partial="+searchTopicInput.value)
+            .then(response=>response.json())
+            .then(data=>{
+                const table= document.querySelector("table")
+                table.innerHTML= `<tr>
+                    <th>Problem Name</th>
+                    <th>Topic</th>
+                    <th>Difficulty</th>
+                    <th>Last Reviewed</th>
+                    <th>Action</th>
+                </tr>`
+                for (const problem of data) {
+                    buildRow(problem,table);
+                }
+            })
+        })
+        
+        searchNameBttn.addEventListener("click", function(event){
+            event.preventDefault();
+            fetch("/search-by-name?partial="+searchNameInput.value)
+            .then(response=>response.json())
+            .then(data=>{
+                const table=document.querySelector("table")
+                table.innerHTML=`<tr>
+                    <th>Problem Name</th>
+                    <th>Topic</th>
+                    <th>Difficulty</th>
+                    <th>Last Reviewed</th>
+                    <th>Action</th>
+                </tr>`
+                for (const problem of data) {
+                    buildRow(problem,table);
+                }
+            })
+        })
 
         button.addEventListener("click", function(event){
             event.preventDefault();
@@ -83,16 +128,63 @@
             .then(data=>console.log(data))
             .then(loadProblems)
             .then(()=> {nameInput.value="";topicInput.value= ""; difficultyInput.value="";neededHint.checked= false });
-
-            //console.log(nameInput.value, topicInput.value, difficultyInput.value, neededHint.checked)
            
         });
+
+        function buildRow(problem,table){
+            const newRow= document.createElement("tr")
+            newRow.innerHTML= `<td>${problem.name}</td><td> ${problem.topic}</td><td>${problem.difficulty}</td><td>${problem.last_reviewed}</td>`
+            
+            const actionsCell=document.createElement("td")
+
+            const deleteBttn=document.createElement("button");
+            deleteBttn.textContent= "Delete"
+            // when clicked, send this problem's id to Flask to delete it, then refresh the table
+            deleteBttn.addEventListener("click", function(event){
+                event.preventDefault();
+                fetch("/delete-problem", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: problem.id })
+                })
+                .then(response=> response.json())
+                .then(data=> {
+                    console.log(data)
+                    loadProblems(); // refresh the table after a successful delete
+            });
+            });
+
+            actionsCell.appendChild(deleteBttn)
+            
+            const editBttn= document.createElement("button");
+            editBttn.textContent="Edit Topic";
+            editBttn.addEventListener("click", function(event){
+                event.preventDefault();
+                const newTopic= prompt("Enter new topic:");
+                if (newTopic){
+                    fetch("/edit-topic", {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ topic: newTopic, id: problem.id })
+                    })
+                .then(response=> response.json())
+                .then(data=> {
+                    console.log(data)
+                    loadProblems(); // refresh the table after a successful delete
+            })};
+            });
+
+            actionsCell.appendChild(editBttn)
+            newRow.appendChild(actionsCell)
+            table.appendChild(newRow)
+        }
+
         function loadProblems(){
             // fetch all problems from the backend
-
             fetch("/get-problems")
             .then(response=> response.json())
             .then(data=> {
+
                 const table= document.querySelector("table")
                 table.innerHTML= 
                 `<tr>
@@ -104,56 +196,14 @@
                 </tr>`
                 // build one table row per problem
                 for (const problem of data) {
-                    const newRow= document.createElement("tr")
-                    // fill the first four cells with the problem's data
-                    newRow.innerHTML= `<td>${problem.name}</td><td> ${problem.topic}</td><td>${problem.difficulty}</td><td>${problem.last_reviewed}</td>`
-                    // build the "actions" cell separately so the button can have its own click listener
-                    const actionsCell=document.createElement("td")
-                    const deleteBttn=document.createElement("button");
-                    deleteBttn.textContent= "Delete"
-                    // when clicked, send this problem's id to Flask to delete it, then refresh the table
-                    deleteBttn.addEventListener("click", function(event){
-                        event.preventDefault();
-                        fetch("/delete-problem", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ id: problem.id })
-                        })
-                        .then(response=> response.json())
-                        .then(data=> {
-                            console.log(data)
-                            loadProblems(); // refresh the table after a successful delete
-                    });
-                    });
-
-                    actionsCell.appendChild(deleteBttn)
-                    
-                    const editBttn= document.createElement("button");
-                    editBttn.textContent="Edit Topic";
-                    editBttn.addEventListener("click", function(event){
-                        event.preventDefault();
-                        const newTopic= prompt("Enter new topic:");
-                        if (newTopic){
-                            fetch("/edit-topic", {
-                                method: "PUT",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ topic: newTopic, id: problem.id })
-                            })
-                        .then(response=> response.json())
-                        .then(data=> {
-                            console.log(data)
-                            loadProblems(); // refresh the table after a successful delete
-                    })};
-                    });
-
-                    actionsCell.appendChild(editBttn)
-                    newRow.appendChild(actionsCell)
-                    table.appendChild(newRow)
-                                     
+                    buildRow(problem,table)
                 }
             })      
         }
+
         loadProblems()
+
+        
         
     </script>
 </body>

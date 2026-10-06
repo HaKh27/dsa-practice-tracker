@@ -67,6 +67,8 @@ def needs_review(conn):
     SELECT * 
     FROM problems 
     WHERE last_reviewed < ? 
+    ORDER BY last_reviewed ASC
+
     """, (cutoff,))
     return cursor.fetchall()
 
