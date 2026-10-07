@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql, get_by_topic,find_by_name_sql
+from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql, get_by_topic,find_by_name_sql, update_field_sql
 from datetime import date 
 from dsa_tracker import convert_rows
 
@@ -71,6 +71,20 @@ def search_by_topic():
     result= get_by_topic(conn,topic)
     data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
     return jsonify(data)
+
+@app.route("/update-field", methods=["PUT"])
+def update_field():
+    data=request.get_json()
+    conn=get_connection()
+    field=data["field"]
+    id=data["id"]
+    value=data["value"]
+    
+    try:
+        update_field_sql(conn,id,field,value)
+        return jsonify({"message":"field updated"})
+    except ValueError as e:
+        return jsonify({"error": str(e)}),400
 
 if __name__=="__main__":
     app.run(debug=True)  # starts the dev server, auto-reloads on code changes

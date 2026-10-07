@@ -4,6 +4,15 @@ from datetime import date, timedelta
 def get_connection():
     return sqlite3.connect("tracker.db")
 
+ALLOWED_FIELDS={"name", "topic", "difficulty", "last_reviewed"}
+def update_field_sql(conn,id, field, value):
+    if field not in ALLOWED_FIELDS:
+        raise ValueError("Invalid field")
+
+    query=f"UPDATE problems SET {field}=? WHERE id=?"
+    conn.execute(query, (value,id))
+    conn.commit()
+
 def get_unreviewed(conn):
     cursor= conn.execute("""
         SELECT problems.name, problems.difficulty

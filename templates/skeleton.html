@@ -133,8 +133,31 @@
 
         function buildRow(problem,table){
             const newRow= document.createElement("tr")
-            newRow.innerHTML= `<td>${problem.name}</td><td> ${problem.topic}</td><td>${problem.difficulty}</td><td>${problem.last_reviewed}</td>`
-            
+
+            //name cell
+            const nameCell=document.createElement("td");
+            nameCell.textContent=problem.name;
+            newRow.appendChild(nameCell);
+            //topic cell
+            const topicCell= document.createElement("td");
+            topicCell.textContent=problem.topic;
+            //pencil icon
+
+            const pencilBttn= document.createElement("button");
+            pencilBttn.textContent="✏️";
+
+            topicCell.appendChild(pencilBttn);
+            newRow.appendChild(topicCell);
+            //difficulty cell
+            const difficultyCell=document.createElement("td");
+            difficultyCell.textContent=problem.difficulty;
+            newRow.appendChild(difficultyCell);
+
+            //last_reviewed cell
+            const dateCell= document.createElement("td");
+            dateCell.textContent=problem.last_reviewed;
+            newRow.appendChild(dateCell);
+
             const actionsCell=document.createElement("td")
 
             const deleteBttn=document.createElement("button");
@@ -174,6 +197,45 @@
             })};
             });
 
+            pencilBttn.addEventListener("click", function(event){
+                event.preventDefault();
+                topicCell.innerHTML=""; //clear existing content
+                const input= document.createElement("input")
+                //input.value= ""; //prefill with current value
+                topicCell.appendChild(input);
+
+               
+                
+                input.addEventListener("keydown", function(event){
+                    if(event.key=="Enter"){
+                        if (input.value==""){return;}
+                        fetch("/update-field", {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ field: "topic", id: problem.id, value: input.value })
+                        
+                    })
+                    
+                    .then(response=>response.json())
+                    .then(data=> {
+                        console.log(data);
+                        loadProblems();
+
+                    });
+                    
+                  
+                }
+                })
+                input.addEventListener("blur", function(){
+                    topicCell.innerHTML="";
+                    topicCell.textContent=problem.topic;
+                    topicCell.appendChild(pencilBttn);
+
+                })
+            
+            })
+            
+            
             actionsCell.appendChild(editBttn)
             newRow.appendChild(actionsCell)
             table.appendChild(newRow)
