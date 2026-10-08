@@ -21,8 +21,7 @@
             <option value = "Hard">Hard</option>
         </select>
 
-        <input type="checkbox" id="needsHint" name="needsHint">
-        <label for="needsHint">Needed a hint? </label>
+        
         
         <button type="submit">Add Problem</button>
     </form>
@@ -44,11 +43,11 @@
         
     </table>
     <script>
+        let activeCancel = null;
         const button= document.querySelector("button")
         const nameInput=document.getElementById("name");
         const topicInput= document.getElementById("topic");
         const difficultyInput= document.getElementById("difficulty");
-        const neededHint=document.getElementById("needsHint")
         const reviewButton=document.getElementById("reviewButton")
         const searchTopicBttn= document.getElementById("searchByTopic")
         const searchNameBttn= document.getElementById("searchByName")
@@ -120,24 +119,31 @@
             fetch("/add-problem",{
                 method: "POST",
                 headers:{"Content-Type": "application/json"},
-                body: JSON.stringify({name:nameInput.value,topic: topicInput.value, difficulty:difficultyInput.value, hint:neededHint.checked })
+                body: JSON.stringify({name:nameInput.value,topic: topicInput.value, difficulty:difficultyInput.value })
 
 
             })
             .then(response => response.json())
             .then(data=>console.log(data))
             .then(loadProblems)
-            .then(()=> {nameInput.value="";topicInput.value= ""; difficultyInput.value="";neededHint.checked= false });
+            .then(()=> {nameInput.value="";topicInput.value= ""; difficultyInput.value=""; });
            
         });
 
         function buildRow(problem,table){
+
             const newRow= document.createElement("tr")
 
             //name cell
+            const pencilBttn3= document.createElement("button");
+            pencilBttn3.textContent="✏️";
+            pencilBttn3.style.marginLeft = "50px";
             const nameCell=document.createElement("td");
             nameCell.textContent=problem.name;
+
+            nameCell.appendChild(pencilBttn3);
             newRow.appendChild(nameCell);
+            nameCell.classList.add("editable-cell");
             //topic cell
             const topicCell= document.createElement("td");
             topicCell.textContent=problem.topic;
@@ -145,18 +151,32 @@
 
             const pencilBttn= document.createElement("button");
             pencilBttn.textContent="✏️";
-
+            pencilBttn.style.marginLeft = "10px";
             topicCell.appendChild(pencilBttn);
             newRow.appendChild(topicCell);
+            topicCell.classList.add("editable-cell");
             //difficulty cell
+            const pencilBttn4= document.createElement("button");
+            pencilBttn4.textContent="✏️";
+            pencilBttn4.style.marginLeft = "10px";
             const difficultyCell=document.createElement("td");
             difficultyCell.textContent=problem.difficulty;
+            difficultyCell.appendChild(pencilBttn4);
             newRow.appendChild(difficultyCell);
+            difficultyCell.classList.add("editable-cell")
 
             //last_reviewed cell
+            const pencilBttn2= document.createElement("button");
+            pencilBttn2.textContent='✏️';
+            pencilBttn2.style.marginLeft = "10px";
             const dateCell= document.createElement("td");
             dateCell.textContent=problem.last_reviewed;
+            dateCell.append(pencilBttn2);
+
+
             newRow.appendChild(dateCell);
+            dateCell.classList.add("editable-cell");
+
 
             const actionsCell=document.createElement("td")
 
@@ -179,32 +199,23 @@
 
             actionsCell.appendChild(deleteBttn)
             
-            const editBttn= document.createElement("button");
-            editBttn.textContent="Edit Topic";
-            editBttn.addEventListener("click", function(event){
-                event.preventDefault();
-                const newTopic= prompt("Enter new topic:");
-                if (newTopic){
-                    fetch("/edit-topic", {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ topic: newTopic, id: problem.id })
-                    })
-                .then(response=> response.json())
-                .then(data=> {
-                    console.log(data)
-                    loadProblems(); // refresh the table after a successful delete
-            })};
-            });
+            
 
             pencilBttn.addEventListener("click", function(event){
                 event.preventDefault();
+                if (activeCancel) { activeCancel(); }
                 topicCell.innerHTML=""; //clear existing content
                 const input= document.createElement("input")
                 //input.value= ""; //prefill with current value
                 topicCell.appendChild(input);
 
-               
+               function cancelTopicEdit() {
+                    topicCell.innerHTML = "";
+                    topicCell.textContent = problem.topic;
+                    topicCell.appendChild(pencilBttn);
+                    activeCancel = null;
+                }
+                activeCancel = cancelTopicEdit;
                 
                 input.addEventListener("keydown", function(event){
                     if(event.key=="Enter"){
@@ -226,17 +237,133 @@
                   
                 }
                 })
-                input.addEventListener("blur", function(){
-                    topicCell.innerHTML="";
-                    topicCell.textContent=problem.topic;
-                    topicCell.appendChild(pencilBttn);
+                
 
+                input.addEventListener("blur", function() {
+                    if (activeCancel === cancelTopicEdit) { cancelTopicEdit(); }
+                });
+            });
+
+            pencilBttn2.addEventListener("click", function(event){
+                event.preventDefault();
+                if (activeCancel) { activeCancel(); }
+                dateCell.innerHTML=""; //clear existing content
+                const input= document.createElement("input")
+                input.type="date"
+                dateCell.appendChild(input);
+
+                function cancelDateEdit() {
+                    dateCell.innerHTML = "";
+                    dateCell.textContent = problem.last_reviewed;
+                    dateCell.appendChild(pencilBttn2);
+                    activeCancel = null;
+                }
+                activeCancel = cancelDateEdit;
+
+                input.addEventListener("keydown", function(event){
+                    if(event.key=="Enter"){
+                        if(input.value==""){return;}
+                        activeCancel=null;
+                        fetch("/update-field",{
+                            method:"PUT",
+                            headers:{"Content-Type":"application/json"},
+                            body: JSON.stringify({field:"last_reviewed", id: problem.id, value:input.value})
+
+                        })
+                        .then(response=>response.json())
+                        .then(data=> {
+                            console.log(data)
+                            loadProblems();
+                        });
+                    }
+                });
+                input.addEventListener("blur", function() {
+                    if (activeCancel === cancelDateEdit) { cancelDateEdit(); }
+                });
+            });
+
+            pencilBttn3.addEventListener("click", function(event){
+                event.preventDefault();
+                if (activeCancel) { activeCancel(); }
+                nameCell.innerHTML="";
+                const input=document.createElement("input")
+                nameCell.appendChild(input)
+
+                function cancelNameEdit() {
+                    nameCell.innerHTML = "";
+                    nameCell.textContent = problem.name;
+                    nameCell.appendChild(pencilBttn3);
+                    activeCancel = null;
+                }
+                activeCancel = cancelNameEdit;
+
+                input.addEventListener("keydown",function(event){
+                    if(event.key=="Enter"){
+                        if(input.value==""){return;}
+                        activeCancel=null;
+                        fetch("/update-field", {
+                            method:"PUT",
+                            headers: {"Content-Type": "application/json"},
+                            body: JSON.stringify({field:"name", id:problem.id, value: input.value})
+                        })
+                        .then(response=>response.json())
+                        .then(data=> {
+                            console.log(data);
+                            loadProblems();
+                        });
+                    }
                 })
-            
+                input.addEventListener("blur", function() {
+                    if (activeCancel === cancelNameEdit) { cancelNameEdit(); }
+                });
+            });
+
+            pencilBttn4.addEventListener("click", function(event){
+                event.preventDefault();
+                if (activeCancel) { activeCancel(); }
+                difficultyCell.innerHTML="";
+
+                const select=document.createElement("select");
+                const options=["Easy", "Medium", "Hard"];
+                for (const opt of options){
+                    const optionElement=document.createElement("option");
+                    optionElement.value=opt;
+                    optionElement.textContent=opt;
+                    select.appendChild(optionElement);
+                }
+                select.value=problem.difficulty
+                difficultyCell.appendChild(select);
+
+                function cancelDifficulty() {
+                    difficultyCell.innerHTML = "";
+                    difficultyCell.textContent = problem.difficulty;
+                    difficultyCell.appendChild(pencilBttn4);
+                    activeCancel = null;
+                }
+                activeCancel = cancelDifficulty;
+
+                select.addEventListener("change", function(event){
+                    activeCancel=null;
+                    fetch("/update-field",{
+                        method:"PUT",
+                        headers:{"Content-Type":"application/json"},
+                        body: JSON.stringify({field:"difficulty", id:problem.id, value:select.value})
+                    })
+                    .then(response=>response.json())
+                    .then(data=> {
+                        console.log(data)
+                        loadProblems();
+                    });
+                })
+
+
+                select.addEventListener("blur", function() {
+                    if (activeCancel === cancelDifficulty) { cancelDifficulty(); }
+                });
             })
+
             
             
-            actionsCell.appendChild(editBttn)
             newRow.appendChild(actionsCell)
             table.appendChild(newRow)
         }
