@@ -1,8 +1,8 @@
 import sqlite3
 from datetime import date, timedelta
 
-def get_connection():
-    return sqlite3.connect("tracker.db")
+def get_connection(db_name="tracker.db"):
+    return sqlite3.connect(db_name)
 
 ALLOWED_FIELDS={"name", "topic", "difficulty", "last_reviewed"}
 def update_field_sql(conn,id, field, value):
