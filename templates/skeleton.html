@@ -24,6 +24,7 @@
         
         
         <button type="submit">Add Problem</button>
+
     </form>
     
     <button type="button" id="reviewButton">See Problems Needing Review</button>
@@ -31,6 +32,7 @@
     <button type="button" id="searchByTopic">Search by Topic</button>
     <input type="text" id="searchName" name="searchName">
     <button type="button" id="searchByName">Search by Name</button>
+    <button type="button" id ="viewAllButton">View All Problems</button>
 
     <table>
         <tr>
@@ -53,6 +55,12 @@
         const searchNameBttn= document.getElementById("searchByName")
         const searchTopicInput=document.getElementById("searchTopic")
         const searchNameInput=document.getElementById("searchName")
+        const viewAllButton= document.getElementById("viewAllButton")
+
+        viewAllButton.addEventListener("click", function(event){
+            event.preventDefault()
+            loadProblems();
+        })
         
         reviewButton.addEventListener("click", function(event){
             event.preventDefault();
