@@ -1,31 +1,41 @@
 import sqlite3
 from datetime import date, timedelta
+import os 
+from dotenv import load_dotenv
+import psycopg2
 
-def get_connection(db_name="tracker.db"):
-    return sqlite3.connect(db_name)
+load_dotenv()
+db_host= os.environ.get("DB_HOST")
+db_name= os.environ.get("DB_NAME")
+db_user= os.environ.get("DB_USER")
+db_password= os.environ.get("DB_PASSWORD")
+
+def get_connection():
+    db_host= os.environ.get("DB_HOST")
+    db_name= os.environ.get("DB_NAME")
+    db_user= os.environ.get("DB_USER")
+    db_password= os.environ.get("DB_PASSWORD")
+
+    return psycopg2.connect(host=db_host, dbname= db_name, user=db_user, password= db_password)
+
 
 ALLOWED_FIELDS={"name", "topic", "difficulty", "last_reviewed"}
 def update_field_sql(conn,id, field, value):
     if field not in ALLOWED_FIELDS:
         raise ValueError("Invalid field")
 
-    query=f"UPDATE problems SET {field}=? WHERE id=?"
-    conn.execute(query, (value,id))
+    query=f"UPDATE problems SET {field}=%s WHERE id=%s"
+    cursor= conn.cursor()
+    cursor.execute(query, (value,id))
     conn.commit()
 
-def get_unreviewed(conn):
-    cursor= conn.execute("""
-        SELECT problems.name, problems.difficulty
-        FROM problems
-        LEFT JOIN sessions ON problems.name= sessions.problem_name
-        WHERE sessions.problem_name IS NULL
-    """)
-    return cursor.fetchall()
+
 
 def create_table(conn):
-    conn.execute("""
+    cursor=conn.cursor()
+    cursor.execute("""
         CREATE TABLE problems (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             name TEXT,
             topic TEXT,
             difficulty TEXT,
@@ -34,22 +44,28 @@ def create_table(conn):
     """)
     conn.commit()
 
+
 def insert_problems(conn,name,topic,difficulty,last_reviewed=str(date.today())):
-    conn.execute("""
-        INSERT INTO problems(name,topic, difficulty,last_reviewed)
-        VALUES(?,?,?,?)
-    """, (name, topic, difficulty,last_reviewed))
-    conn.commit()    
+    cursor= conn.cursor()
+    cursor.execute("""
+        INSERT INTO problems(name, topic, difficulty, last_reviewed)
+        VALUES(%s, %s, %s, %s)
+    """, (name, topic, difficulty, last_reviewed))
+    conn.commit()
+
+
 
 def get_all_problems(conn):
-    cursor= conn.execute("SELECT * FROM problems")
+    cursor= conn.cursor()
+    cursor.execute("SELECT * FROM problems")
     return cursor.fetchall()
 
 def get_by_topic(conn, topic):
-    cursor= conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     SELECT * 
     FROM problems
-    WHERE topic LIKE ?
+    WHERE topic LIKE %s
     """, ( '%' + topic + '%',)) 
     return cursor.fetchall()
 
@@ -71,18 +87,19 @@ def migrate_json_to_sql(conn):
 
 def needs_review(conn):
     cutoff= str(date.today()-timedelta(days=7))
-
-    cursor= conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     SELECT * 
     FROM problems 
-    WHERE last_reviewed < ? 
+    WHERE last_reviewed < %s 
     ORDER BY last_reviewed ASC
 
     """, (cutoff,))
     return cursor.fetchall()
 
 def get_sorted_by_difficulty(conn):
-    cursor= conn.execute("""
+    cursor=conn.cursor()
+    cursor.execute("""
     SELECT * 
     FROM problems
     ORDER BY 
@@ -95,72 +112,80 @@ def get_sorted_by_difficulty(conn):
     return cursor.fetchall()
 
 def edit_topic_sql(conn,new_topic,name):
-    conn.execute(""" 
+    cursor= conn.cursor()
+    cursor.execute(""" 
     UPDATE problems 
-    SET topic=?
-    WHERE name LIKE ?
+    SET topic=%s
+    WHERE name LIKE %s
 
     """, (new_topic, name,))
+    
     conn.commit()
 
-
 def edit_last_reviewed(conn, last_reviewed,id ):
-    conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     UPDATE problems 
-    SET last_reviewed=?
-    WHERE id=? 
+    SET last_reviewed=%s
+    WHERE id=%s
     
     """,(last_reviewed,id,))
     conn.commit()
 
 def edit_last_reviewed_by_name(conn,last_reviewed,name):
-    conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     UPDATE problems 
-    SET last_reviewed=?
-    WHERE name LIKE ? 
+    SET last_reviewed=%s
+    WHERE name LIKE %s
     """, (last_reviewed, name,))
     conn.commit()
 
 
 def edit_difficulty_sql(conn,new_rank,name):
-    conn.execute(""" 
+    cursor= conn.cursor()
+    cursor.execute(""" 
     UPDATE problems 
-    SET difficulty=?
-    WHERE name LIKE ?
+    SET difficulty=%s
+    WHERE name LIKE %s
 
     """, (new_rank, name,))
     conn.commit()
 
 
 def find_by_name_sql(conn, name):
-    cursor= conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     SELECT * 
     FROM problems 
-    WHERE name LIKE ? 
+    WHERE name LIKE %s
     """, ('%'+ name+ '%',))
     return cursor.fetchall()
 
 def edit_topic_by_id_sql(conn, new_topic, id):
-    conn.execute(""" 
+    cursor= conn.cursor()
+    cursor.execute(""" 
     UPDATE problems 
-    SET topic=?
-    WHERE id= ?
+    SET topic=%s
+    WHERE id= %s
     
     """, (new_topic, id,))
     conn.commit()
 
 def edit_difficulty_by_id_sql(conn, new_rank, id):
-    conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     UPDATE problems
-    SET difficulty=?
-    WHERE id=?
+    SET difficulty=%s
+    WHERE id=%s
     
     """,(new_rank,id,))
     conn.commit()
 
 
 def get_sorted_by_name(conn):
-    cursor= conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     SELECT * 
     FROM problems 
     ORDER BY name asc 
@@ -169,7 +194,8 @@ def get_sorted_by_name(conn):
 
 
 def return_top_3_hardest_problems(conn):
-    cursor= conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     SELECT * 
     FROM problems 
     ORDER BY
@@ -183,17 +209,19 @@ def return_top_3_hardest_problems(conn):
     return cursor.fetchall()
 
 def delete_problem_sql(conn, id):
-    conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     DELETE FROM problems 
-    WHERE id = ? 
+    WHERE id = %s 
      """, (id,))
 
     conn.commit()
 
 def delete_problem_by_name_sql(conn, name):
-    conn.execute("""
+    cursor= conn.cursor()
+    cursor.execute("""
     DELETE FROM problems 
-    WHERE name LIKE ? 
+    WHERE name LIKE %s  
      """, (name,))
 
     conn.commit()
