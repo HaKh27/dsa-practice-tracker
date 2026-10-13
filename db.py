@@ -10,9 +10,10 @@ db_name= os.environ.get("DB_NAME")
 db_user= os.environ.get("DB_USER")
 db_password= os.environ.get("DB_PASSWORD")
 
-def get_connection():
+def get_connection(db_name=None):
     db_host= os.environ.get("DB_HOST")
-    db_name= os.environ.get("DB_NAME")
+    if db_name==None: 
+        db_name= os.environ.get("DB_NAME")
     db_user= os.environ.get("DB_USER")
     db_password= os.environ.get("DB_PASSWORD")
 
@@ -34,7 +35,7 @@ def update_field_sql(conn,id, field, value):
 def create_table(conn):
     cursor=conn.cursor()
     cursor.execute("""
-        CREATE TABLE problems (
+        CREATE TABLE IF NOT EXISTS problems (
             id SERIAL PRIMARY KEY,
             name TEXT,
             topic TEXT,
@@ -84,6 +85,22 @@ def migrate_json_to_sql(conn):
                 break 
         if found==False:           
             insert_problems(conn,p["name"],p["topic"],p["difficulty"],p["last_reviewed"])
+
+def migrate_sqlite_to_postgres(new_conn):
+    old_conn= sqlite3.connect("tracker.db")
+    old_cursor= old_conn.cursor()
+    old_cursor.execute("SELECT * FROM problems")
+    rows= old_cursor.fetchall()
+
+    for r in rows: 
+        name=r[1]
+        topic=r[2]
+        difficulty=r[3]
+        last_reviewed=r[4]
+        insert_problems(new_conn, name, topic, difficulty, last_reviewed)
+
+    old_conn.close()
+
 
 def needs_review(conn):
     cutoff= str(date.today()-timedelta(days=7))
@@ -225,6 +242,7 @@ def delete_problem_by_name_sql(conn, name):
      """, (name,))
 
     conn.commit()
+
 
 
 if __name__=="__main__":
