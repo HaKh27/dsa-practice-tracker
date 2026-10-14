@@ -9,6 +9,8 @@ db_host= os.environ.get("DB_HOST")
 db_name= os.environ.get("DB_NAME")
 db_user= os.environ.get("DB_USER")
 db_password= os.environ.get("DB_PASSWORD")
+db_port= os.environ.get("DB_PORT", "5432")
+
 
 def get_connection(db_name=None):
     db_host= os.environ.get("DB_HOST")
@@ -16,8 +18,10 @@ def get_connection(db_name=None):
         db_name= os.environ.get("DB_NAME")
     db_user= os.environ.get("DB_USER")
     db_password= os.environ.get("DB_PASSWORD")
+    db_port= os.environ.get("DB_PORT", "5432")
 
-    return psycopg2.connect(host=db_host, dbname= db_name, user=db_user, password= db_password)
+
+    return psycopg2.connect(host=db_host, dbname= db_name, user=db_user, password= db_password, port=db_port)
 
 
 ALLOWED_FIELDS={"name", "topic", "difficulty", "last_reviewed"}
@@ -66,7 +70,7 @@ def get_by_topic(conn, topic):
     cursor.execute("""
     SELECT * 
     FROM problems
-    WHERE topic LIKE %s
+    WHERE topic ILIKE %s
     """, ( '%' + topic + '%',)) 
     return cursor.fetchall()
 
@@ -175,7 +179,7 @@ def find_by_name_sql(conn, name):
     cursor.execute("""
     SELECT * 
     FROM problems 
-    WHERE name LIKE %s
+    WHERE name ILIKE %s
     """, ('%'+ name+ '%',))
     return cursor.fetchall()
 
