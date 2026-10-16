@@ -219,3 +219,5 @@ __marimo__/
 tracker.db
 
 .env
+
+dsa_dump.sql

@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <div class="container">
     <h1>DS&A Tracker</h1>
     <form>
         <p>Add a new problem: </p>
@@ -26,14 +27,14 @@
         <button type="submit">Add Problem</button>
 
     </form>
-    
-    <button type="button" id="reviewButton">See Problems Needing Review</button>
-    <input type="text" id="searchTopic" name="searchTopic">
-    <button type="button" id="searchByTopic">Search by Topic</button>
-    <input type="text" id="searchName" name="searchName">
-    <button type="button" id="searchByName">Search by Name</button>
-    <button type="button" id ="viewAllButton">View All Problems</button>
-
+    <div class="button_type">
+        <button type="button" id="reviewButton">See Problems Needing Review</button>
+        <input type="text" id="searchTopic" name="searchTopic">
+        <button type="button" id="searchByTopic">Search by Topic</button>
+        <input type="text" id="searchName" name="searchName">
+        <button type="button" id="searchByName">Search by Name</button>
+        <button type="button" id ="viewAllButton">View All Problems</button>
+    </div>
     <table>
         <tr>
             <th>Problem Name</th>
@@ -44,6 +45,7 @@
         </tr>
         
     </table>
+    </div>
     <script>
         let activeCancel = null;
         const button= document.querySelector("button")
@@ -141,49 +143,61 @@
         function buildRow(problem,table){
 
             const newRow= document.createElement("tr")
+            const wrapper= document.createElement("span")
+            wrapper.textContent= problem.name 
 
             //name cell
             const pencilBttn3= document.createElement("button");
             pencilBttn3.textContent="✏️";
             pencilBttn3.style.marginLeft = "50px";
             const nameCell=document.createElement("td");
-            nameCell.textContent=problem.name;
 
-            nameCell.appendChild(pencilBttn3);
+            wrapper.appendChild(pencilBttn3);
+            
+            wrapper.classList.add("editable-cell");
+            nameCell.appendChild(wrapper)
             newRow.appendChild(nameCell);
-            nameCell.classList.add("editable-cell");
+
             //topic cell
+            const topicWrapper= document.createElement("span")
+
             const topicCell= document.createElement("td");
-            topicCell.textContent=problem.topic;
+            topicWrapper.textContent=problem.topic;
             //pencil icon
 
             const pencilBttn= document.createElement("button");
             pencilBttn.textContent="✏️";
             pencilBttn.style.marginLeft = "10px";
-            topicCell.appendChild(pencilBttn);
+            topicWrapper.appendChild(pencilBttn);
+            topicCell.appendChild(topicWrapper)
             newRow.appendChild(topicCell);
-            topicCell.classList.add("editable-cell");
+            topicWrapper.classList.add("editable-cell");
+
             //difficulty cell
+            const difficultyWrapper=document.createElement("span")
             const pencilBttn4= document.createElement("button");
             pencilBttn4.textContent="✏️";
             pencilBttn4.style.marginLeft = "10px";
             const difficultyCell=document.createElement("td");
-            difficultyCell.textContent=problem.difficulty;
-            difficultyCell.appendChild(pencilBttn4);
+            difficultyWrapper.textContent=problem.difficulty;
+            difficultyWrapper.appendChild(pencilBttn4);
+            difficultyCell.appendChild(difficultyWrapper)
             newRow.appendChild(difficultyCell);
-            difficultyCell.classList.add("editable-cell")
+            difficultyWrapper.classList.add("editable-cell")
 
             //last_reviewed cell
+            const lrWrapper=document.createElement("span")
             const pencilBttn2= document.createElement("button");
             pencilBttn2.textContent='✏️';
             pencilBttn2.style.marginLeft = "10px";
             const dateCell= document.createElement("td");
-            dateCell.textContent=problem.last_reviewed;
-            dateCell.append(pencilBttn2);
+            lrWrapper.textContent=problem.last_reviewed;
+            lrWrapper.append(pencilBttn2);
+            dateCell.appendChild(lrWrapper)
 
 
             newRow.appendChild(dateCell);
-            dateCell.classList.add("editable-cell");
+            lrWrapper.classList.add("editable-cell");
 
 
             const actionsCell=document.createElement("td")
@@ -219,8 +233,9 @@
 
                function cancelTopicEdit() {
                     topicCell.innerHTML = "";
-                    topicCell.textContent = problem.topic;
-                    topicCell.appendChild(pencilBttn);
+                    topicWrapper.textContent = problem.topic;
+                    topicWrapper.appendChild(pencilBttn);
+                    topicCell.appendChild(topicWrapper)
                     activeCancel = null;
                 }
                 activeCancel = cancelTopicEdit;
@@ -262,8 +277,9 @@
 
                 function cancelDateEdit() {
                     dateCell.innerHTML = "";
-                    dateCell.textContent = problem.last_reviewed;
-                    dateCell.appendChild(pencilBttn2);
+                    lrWrapper.textContent = problem.last_reviewed;
+                    lrWrapper.appendChild(pencilBttn2);
+                    dateCell.appendChild(lrWrapper)
                     activeCancel = null;
                 }
                 activeCancel = cancelDateEdit;
@@ -298,9 +314,11 @@
                 nameCell.appendChild(input)
 
                 function cancelNameEdit() {
+                    
                     nameCell.innerHTML = "";
-                    nameCell.textContent = problem.name;
-                    nameCell.appendChild(pencilBttn3);
+                    wrapper.textContent = problem.name;
+                    wrapper.appendChild(pencilBttn3);
+                    nameCell.appendChild(wrapper)
                     activeCancel = null;
                 }
                 activeCancel = cancelNameEdit;
@@ -344,8 +362,9 @@
 
                 function cancelDifficulty() {
                     difficultyCell.innerHTML = "";
-                    difficultyCell.textContent = problem.difficulty;
-                    difficultyCell.appendChild(pencilBttn4);
+                    difficultyWrapper.textContent = problem.difficulty;
+                    difficultyWrapper.appendChild(pencilBttn4);
+                    difficultyCell.appendChild(difficultyWrapper)
                     activeCancel = null;
                 }
                 activeCancel = cancelDifficulty;
