@@ -8,6 +8,7 @@
     <div class="container">
     <h1>DS&A Tracker</h1>
     <form>
+        <div class="problem_form">
         <p>Add a new problem: </p>
         <label for ="name">Problem Name: </label>
         <input type="text" id="name" name="name">
@@ -25,14 +26,18 @@
         
         
         <button type="submit">Add Problem</button>
+        </div>
 
     </form>
     <div class="button_type">
-        <button type="button" id="reviewButton">See Problems Needing Review</button>
         <input type="text" id="searchTopic" name="searchTopic">
         <button type="button" id="searchByTopic">Search by Topic</button>
         <input type="text" id="searchName" name="searchName">
         <button type="button" id="searchByName">Search by Name</button>
+    </div>
+    <div class="buttonActionOnly">
+        <button type="button" id="reviewButton">See Problems Needing Review</button>
+  
         <button type="button" id ="viewAllButton">View All Problems</button>
     </div>
     <table>
