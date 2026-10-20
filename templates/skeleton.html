@@ -5,10 +5,19 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
+    <nav class="navbar">
     <h1>DS&A Tracker</h1>
-    <form>
-        <div class="problem_form">
+    <div class="nav-actions">
+        <input type="text" id="searchName" name="searchName">
+        <button type="button" id="searchByName">Search by Name</button>
+        <button type="button" id="reviewButton">See Problems Needing Review</button>
+        <button type="button" id ="viewAllButton">View All Problems</button>
+    </div>
+    </nav>
+    <div class="container">
+    
+        <form>
+            <div class="problem_form">
         <p>Add a new problem: </p>
         <label for ="name">Problem Name: </label>
         <input type="text" id="name" name="name">
@@ -22,24 +31,16 @@
             <option value="Medium">Medium</option>
             <option value = "Hard">Hard</option>
         </select>
-
         
-        
-        <button type="submit">Add Problem</button>
+        <button type="submit" id="submit">Add Problem</button>
         </div>
-
     </form>
+
     <div class="button_type">
         <input type="text" id="searchTopic" name="searchTopic">
         <button type="button" id="searchByTopic">Search by Topic</button>
-        <input type="text" id="searchName" name="searchName">
-        <button type="button" id="searchByName">Search by Name</button>
     </div>
-    <div class="buttonActionOnly">
-        <button type="button" id="reviewButton">See Problems Needing Review</button>
-  
-        <button type="button" id ="viewAllButton">View All Problems</button>
-    </div>
+    
     <table>
         <tr>
             <th>Problem Name</th>
@@ -53,7 +54,7 @@
     </div>
     <script>
         let activeCancel = null;
-        const button= document.querySelector("button")
+        const button= document.getElementById("submit")
         const nameInput=document.getElementById("name");
         const topicInput= document.getElementById("topic");
         const difficultyInput= document.getElementById("difficulty");
@@ -63,6 +64,11 @@
         const searchTopicInput=document.getElementById("searchTopic")
         const searchNameInput=document.getElementById("searchName")
         const viewAllButton= document.getElementById("viewAllButton")
+        const form=document.querySelector("form")
+
+    
+
+        
 
         viewAllButton.addEventListener("click", function(event){
             event.preventDefault()

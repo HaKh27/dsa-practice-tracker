@@ -17,6 +17,9 @@ def add_problem():
     topic= data["topic"]
     difficulty= data["difficulty"]
 
+    if not name or not topic or not difficulty:
+        return jsonify({"error": "All fields are required"}), 400
+
     conn= get_connection() # open a connection to tracker.db
     insert_problems(conn,name,topic, difficulty, str(date.today())) # insert into SQL
 

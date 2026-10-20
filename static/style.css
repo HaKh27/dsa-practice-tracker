@@ -21,7 +21,7 @@ td {
 }
 
 #name{
-    color:brown;
+    color:rgb(251, 251, 251);
     padding: 5px;
 
 
@@ -31,12 +31,15 @@ th{
     padding:8px;
     background-color: var(--background-color);
     font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+
+
 }
 
 :root{
 
     --background-color: rgb(0, 0, 29);
-    --color-layer: rgb(9, 4, 55) ;
+    --color-layer: rgb(6, 1, 43) ;
     --text-color: rgb(233, 217, 217) ;
     --glow-color:  rgb(178, 178, 205);
 }
@@ -44,7 +47,7 @@ th{
 body{
     background-color: var(--background-color);
     color: var(--text-color);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Avenir Next', 'Century Gothic', 'Segoe UI', sans-serif;    
 }
 
 * {
@@ -101,21 +104,50 @@ form {
 
 }
 
-label {
-    background-color: var(--color-layer);
-    box-shadow: 0px 0px 20px var(--glow-color);
-
-    padding: 10px;
-    border-radius: 10px 
+label,p {
+    background:none;
+    box-shadow: none;
+    padding:0;
+    border-radius: 0;
+    font-weight:bold;
 }
 
-p {
-    background-color: var(--color-layer);
-    box-shadow: 0px 0px 20px var(--glow-color);
+.navbar{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: rgba(14, 15, 38, 0.961);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border:1px solid rgba(40, 23, 68, 0.2);
+    max-width: 80%;
+    margin:0 auto;
+    border-radius: 20px;
+}
 
-    padding: 10px;
-    border-radius: 10px ;
+.navbar h1 {
+    box-shadow:none;
+    width: auto;
+    margin:0;
+    text-align: left;
+    font-size:1.5rem;
+}
 
+.nav-actions{
+    display:flex;
+    gap:15px
+}
+
+.nav-actions button{
+    background:none;
+    box-shadow: none;
+    padding: 8px 12px;
+}
+
+.nav-actions button:hover{
+    box-shadow:none;
+    color: var(--glow-color);
 }
 
 .problem_form{
@@ -131,4 +163,15 @@ p {
     gap: 10px;
     justify-content: center;
     margin-top: 20px;
+}
+
+.toolbar{
+    display:flex;
+    align-items: center;
+    gap:10px;
+    background-color: var(--color-layer);
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin: 20px auto;
+    max-width: 90%;
 }
