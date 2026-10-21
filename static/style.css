@@ -136,7 +136,7 @@ label,p {
 
 .nav-actions{
     display:flex;
-    gap:15px
+    gap:15px;
 }
 
 .nav-actions button{
@@ -174,4 +174,34 @@ label,p {
     padding: 15px 20px;
     margin: 20px auto;
     max-width: 90%;
+}
+
+.hidden {
+    display:none;
+}
+
+.filter-panel{
+    position:absolute;
+    top: 100%;
+    left: 0%;
+    padding: 0.5%;
+    background-color: black;
+    border-radius: 10%;
+    min-width: 180px;
+
+}
+
+.filter-wrapper{
+    position:relative;
+    
+}
+.category-toggle{
+    font-weight:bold;
+}
+
+.category-options label{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    font-weight: normal;
 }

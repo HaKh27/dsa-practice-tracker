@@ -10,8 +10,28 @@
     <div class="nav-actions">
         <input type="text" id="searchName" name="searchName">
         <button type="button" id="searchByName">Search by Name</button>
+
         <button type="button" id="reviewButton">See Problems Needing Review</button>
+
         <button type="button" id ="viewAllButton">View All Problems</button>
+    
+        <div class="filter-wrapper">
+        <button id="filterButton" class="filter-btn">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M3 4h18l-7 8v6l-4 2v-8z"/>
+        </svg>
+        </button>
+        <div id="filterPanel" class="filter-panel hidden">
+        <div class="filter-category">
+            <button class="category-toggle">Difficulty</button>
+            <div class="category-options hidden">
+            <label><input type="checkbox" name="difficulty" value="Easy"> Easy</label>
+            <label><input type="checkbox" name="difficulty" value="Medium"> Medium</label>
+            <label><input type="checkbox" name="difficulty" value="Hard"> Hard</label>
+    </div>
+    </div>
+    </div>
+    </div>
     </div>
     </nav>
     <div class="container">
@@ -54,6 +74,7 @@
     </div>
     <script>
         let activeCancel = null;
+        let currentDifficulties=[]
         const button= document.getElementById("submit")
         const nameInput=document.getElementById("name");
         const topicInput= document.getElementById("topic");
@@ -65,6 +86,37 @@
         const searchNameInput=document.getElementById("searchName")
         const viewAllButton= document.getElementById("viewAllButton")
         const form=document.querySelector("form")
+        const filterButton=document.getElementById("filterButton")
+
+        filterButton.addEventListener("click", function(event){
+           document.getElementById("filterPanel")
+           .classList.toggle("hidden")
+        });
+
+        document.querySelectorAll(".category-toggle").forEach(function(button){
+            button.addEventListener("click", function(event){
+                this.nextElementSibling.classList.toggle("hidden");
+            });
+        });
+
+        document.querySelectorAll('input[name="difficulty"]').forEach(checkbox=> 
+            checkbox.addEventListener("change", function(event){
+                currentDifficulties= Array.from(document.querySelectorAll('input[name="difficulty"]:checked')).map(cb=>
+                    cb.value);
+                    refreshTable();
+            })
+            
+               // const params= new URLSearchParams();
+              // currentDifficulties.forEach(value=> params.append("value",value));
+
+               // fetch(`/filter-difficulty?${params.toString()}`)
+                //.then (response=> response.json())
+               // .then (data=>loadProblems(data))
+        );
+
+        
+
+       
 
     
 
@@ -151,6 +203,35 @@
            
         });
 
+        function refreshTable(){
+            if  (currentDifficulties.length===0){
+                loadProblems();
+            } else {
+                const params= new URLSearchParams();
+                currentDifficulties.forEach(value=> params.append("value",value));
+
+                fetch(`/filter-difficulty?${params.toString()}`)
+                .then (response=> response.json())
+                .then (data=>renderProblems(data))
+            }
+
+        }
+
+        function renderProblems(data){
+            const table= document.querySelector("table")
+            table.innerHTML = `<tr>
+                <th>Problem Name</th>
+                <th>Topic</th>
+                <th>Difficulty</th>
+                <th>Last Reviewed</th>
+                <th>Action</th>
+            </tr>`;
+            for (const problem of data) {
+                buildRow(problem,table)
+            }
+  
+        };
+
         function buildRow(problem,table){
 
             const newRow= document.createElement("tr")
@@ -226,7 +307,7 @@
                 .then(response=> response.json())
                 .then(data=> {
                     console.log(data)
-                    loadProblems(); // refresh the table after a successful delete
+                    refreshTable(); // refresh the table after a successful delete
             });
             });
 
@@ -264,7 +345,7 @@
                     .then(response=>response.json())
                     .then(data=> {
                         console.log(data);
-                        loadProblems();
+                        refreshTable();
 
                     });
                     
@@ -308,7 +389,7 @@
                         .then(response=>response.json())
                         .then(data=> {
                             console.log(data)
-                            loadProblems();
+                            refreshTable();
                         });
                     }
                 });
@@ -346,7 +427,7 @@
                         .then(response=>response.json())
                         .then(data=> {
                             console.log(data);
-                            loadProblems();
+                            refreshTable();
                         });
                     }
                 })
@@ -390,7 +471,7 @@
                     .then(response=>response.json())
                     .then(data=> {
                         console.log(data)
-                        loadProblems();
+                        refreshTable();
                     });
                 })
 
@@ -411,22 +492,11 @@
             fetch("/get-problems")
             .then(response=> response.json())
             .then(data=> {
-
-                const table= document.querySelector("table")
-                table.innerHTML= 
-                `<tr>
-                    <th>Problem Name</th>
-                    <th>Topic</th>
-                    <th>Difficulty</th>
-                    <th>Last Reviewed</th>
-                    <th>Action</th>
-                </tr>`
-                // build one table row per problem
-                for (const problem of data) {
-                    buildRow(problem,table)
-                }
+               renderProblems(data)
             })      
         }
+
+       
 
         loadProblems()
 

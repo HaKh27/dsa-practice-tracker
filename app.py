@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql, get_by_topic,find_by_name_sql, update_field_sql
+from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql, get_by_topic,find_by_name_sql, update_field_sql, filter_by_difficulty
 from datetime import date 
 from dsa_tracker import convert_rows
 
@@ -88,6 +88,21 @@ def update_field():
         return jsonify({"message":"field updated"})
     except ValueError as e:
         return jsonify({"error": str(e)}),400
+
+@app.route("/filter-difficulty", methods=["GET"])
+def filter_difficulty():
+    conn=get_connection()
+    value= request.args.getlist("value")
+    if value: 
+        result= filter_by_difficulty(conn,value)
+
+    else: 
+        result= get_all_problems(conn)
+    
+    data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
+    return jsonify(data)
+
+
 
 if __name__=="__main__":
     app.run(debug=True)  # starts the dev server, auto-reloads on code changes

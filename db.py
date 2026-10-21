@@ -35,6 +35,21 @@ def update_field_sql(conn,id, field, value):
     conn.commit()
 
 
+def filter_by_difficulty(conn,value):
+    placeholder= ", ".join(["%s"]*len(value))
+    cursor=conn.cursor()
+    cursor.execute(f"""
+        SELECT * FROM problems
+        WHERE difficulty IN ({placeholder})
+        ORDER BY
+            CASE difficulty
+                    WHEN 'Easy' THEN 1
+                    WHEN 'Medium' THEN 2 
+                    WHEN 'Hard' THEN 3
+            END
+    """ , value)
+    return cursor.fetchall()
+
 
 def create_table(conn):
     cursor=conn.cursor()
