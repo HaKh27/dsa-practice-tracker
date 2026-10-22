@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql, get_by_topic,find_by_name_sql, update_field_sql, filter_by_difficulty
+from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql, get_by_topic,find_by_name_sql, update_field_sql, filter_by_difficulty, filter_problems, get_distinct_topics
 from datetime import date 
 from dsa_tracker import convert_rows
 
@@ -102,7 +102,27 @@ def filter_difficulty():
     data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
     return jsonify(data)
 
+@app.route("/filter-problems", methods=["GET"])
+def filter_problem():
+    conn= get_connection()
+    difficulties= request.args.getlist("difficulties")
+    topics= request.args.getlist("topics")
 
+    result= filter_problems(conn, difficulties, topics)
+
+    data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
+    return jsonify(data)
+
+
+@app.route("/distinct-topic", methods=["GET"])
+def distinct_topics():
+    conn= get_connection()
+    result= get_distinct_topics(conn)
+    data = [r[0] for r in result]
+    return jsonify(data)
+
+
+    
 
 if __name__=="__main__":
     app.run(debug=True)  # starts the dev server, auto-reloads on code changes

@@ -25,11 +25,18 @@
         <div class="filter-category">
             <button class="category-toggle">Difficulty</button>
             <div class="category-options hidden">
-            <label><input type="checkbox" name="difficulty" value="Easy"> Easy</label>
-            <label><input type="checkbox" name="difficulty" value="Medium"> Medium</label>
-            <label><input type="checkbox" name="difficulty" value="Hard"> Hard</label>
-    </div>
-    </div>
+                <label><input type="checkbox" name="difficulty" value="Easy"> Easy</label>
+                <label><input type="checkbox" name="difficulty" value="Medium"> Medium</label>
+                <label><input type="checkbox" name="difficulty" value="Hard"> Hard</label>
+            </div>
+        </div>
+        <div class="filter-category">
+            <button class="category-toggle" id="topicToggle">Topics</button>
+            <div class="category-options hidden" id="topicOptions">
+            
+            </div>
+
+        </div>
     </div>
     </div>
     </div>
@@ -56,7 +63,7 @@
         </div>
     </form>
 
-    <div class="button_type">
+    <div class="button_type"> 
         <input type="text" id="searchTopic" name="searchTopic">
         <button type="button" id="searchByTopic">Search by Topic</button>
     </div>
@@ -88,6 +95,7 @@
         const form=document.querySelector("form")
         const filterButton=document.getElementById("filterButton")
 
+
         filterButton.addEventListener("click", function(event){
            document.getElementById("filterPanel")
            .classList.toggle("hidden")
@@ -105,23 +113,12 @@
                     cb.value);
                     refreshTable();
             })
-            
-               // const params= new URLSearchParams();
-              // currentDifficulties.forEach(value=> params.append("value",value));
-
-               // fetch(`/filter-difficulty?${params.toString()}`)
-                //.then (response=> response.json())
-               // .then (data=>loadProblems(data))
+        
         );
-
+            
         
-
+        
        
-
-    
-
-        
-
         viewAllButton.addEventListener("click", function(event){
             event.preventDefault()
             loadProblems();
@@ -204,13 +201,13 @@
         });
 
         function refreshTable(){
-            if  (currentDifficulties.length===0){
+            if  (currentDifficulties.length===0 && currentTopics.length===0){
                 loadProblems();
             } else {
                 const params= new URLSearchParams();
-                currentDifficulties.forEach(value=> params.append("value",value));
-
-                fetch(`/filter-difficulty?${params.toString()}`)
+                currentDifficulties.forEach(value=> params.append("difficulties",value));
+                currentTopics.forEach(value=> params.append("topics",value));
+                fetch(`/filter-problems?${params.toString()}`)
                 .then (response=> response.json())
                 .then (data=>renderProblems(data))
             }
@@ -497,8 +494,35 @@
         }
 
        
+        function loadTopics(){
+            fetch("/distinct-topic")
+            .then(response=>response.json())
+            .then(data=> {
+                const topicOptions=document.getElementById("topicOptions")
+                topicOptions.innerHTML="";
+
+                for (const topic of data){
+                    const label= document.createElement("label");
+                    const checkbox= document.createElement("input");
+                    checkbox.type="checkbox";
+                    checkbox.name= "topic";
+                    checkbox.value=topic;
+
+                    label.appendChild(checkbox)
+                    label.appendChild(document.createTextNode(topic));
+                    topicOptions.appendChild(label);
+
+                    checkbox.addEventListener("change", function(event){
+                        currentTopics=Array.from(document.querySelectorAll('input[name="topic"]:checked')).map(cb=>cb.value);
+                        refreshTable();
+                    });
+                }
+            })
+        }
+
 
         loadProblems()
+        loadTopics()
 
         
         

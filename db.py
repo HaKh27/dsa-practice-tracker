@@ -50,6 +50,44 @@ def filter_by_difficulty(conn,value):
     """ , value)
     return cursor.fetchall()
 
+def filter_problems(conn, difficulties, topics):
+    conditions=[]
+    params=[]
+
+    if difficulties:
+        placeholders=", ".join(["%s"]* len(difficulties))
+        conditions.append(f"difficulty IN ({placeholders})")
+        params.extend(difficulties)
+
+    if topics: 
+        placeholders= ", ".join(["%s"]*len(topics))
+        conditions.append(f"LOWER(topic) IN ({placeholders})")
+        params.extend([t.lower() for t in topics])
+
+    where_clause= " AND ".join(conditions) if conditions else "TRUE"
+
+    cursor= conn.cursor()
+    cursor.execute(f"""
+        SELECT * FROM problems 
+        WHERE {where_clause}
+        ORDER BY 
+            CASE difficulty
+                WHEN 'Easy' THEN 1
+                WHEN 'Medium' THEN 2
+                WHEN 'Hard' THEN 3 
+            END
+    """, params)
+    return cursor.fetchall()
+
+
+def get_distinct_topics(conn):
+    cursor= conn.cursor()
+    cursor.execute("""
+        SELECT DISTINCT ON (LOWER(topic)) topic 
+        FROM problems 
+        ORDER BY LOWER(topic),topic
+    """)
+    return cursor.fetchall()
 
 def create_table(conn):
     cursor=conn.cursor()
