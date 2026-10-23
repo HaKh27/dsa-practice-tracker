@@ -8,10 +8,15 @@
     <nav class="navbar">
     <h1>DS&A Tracker</h1>
     <div class="nav-actions">
-        <input type="text" id="searchName" name="searchName">
-        <button type="button" id="searchByName">Search by Name</button>
+        <div class="search-pill">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="10" cy="10" r="7"/>
+                <line x1="21" y1="21" x2="15" y2="15"/>
+            </svg>
+            <input type="text" placeholder="Search Problem Name" id="searchName">
+        </div>
+     
 
-        <button type="button" id="reviewButton">See Problems Needing Review</button>
 
         <button type="button" id ="viewAllButton">View All Problems</button>
     
@@ -33,8 +38,14 @@
         <div class="filter-category">
             <button class="category-toggle" id="topicToggle">Topics</button>
             <div class="category-options hidden" id="topicOptions">
-            
-            </div>
+        </div>
+
+        <div class="filter-category">
+            <button class="category-toggle" id="needsReviewToggle">Problems Needing Review</button>
+            <div class="category-options hidden">
+                <label><input type="checkbox" id="needsReviewCheckbox">Needs Review</label>
+            </div> 
+        </div>
 
         </div>
     </div>
@@ -47,10 +58,10 @@
             <div class="problem_form">
         <p>Add a new problem: </p>
         <label for ="name">Problem Name: </label>
-        <input type="text" id="name" name="name">
+        <input type="text" id="name" name="name" placeholder="e.g. Two Sum">
 
         <label for="topic">Topic: </label>
-        <input type="text" id="topic" name="topic">
+        <input type="text" id="topic" name="topic" placeholder="e.g. Hash Map">
 
         <label for="difficulty">Difficulty: </label>
         <select id="difficulty" name="difficulty">
@@ -63,10 +74,7 @@
         </div>
     </form>
 
-    <div class="button_type"> 
-        <input type="text" id="searchTopic" name="searchTopic">
-        <button type="button" id="searchByTopic">Search by Topic</button>
-    </div>
+ 
     
     <table>
         <tr>
@@ -81,15 +89,15 @@
     </div>
     <script>
         let activeCancel = null;
-        let currentDifficulties=[]
+        let currentDifficulties=[];
+        let currentTopics=[];
+        let currentNeedsReview= false;
+        const needsReviewCheckbox=document.getElementById("needsReviewCheckbox");
         const button= document.getElementById("submit")
         const nameInput=document.getElementById("name");
         const topicInput= document.getElementById("topic");
         const difficultyInput= document.getElementById("difficulty");
-        const reviewButton=document.getElementById("reviewButton")
-        const searchTopicBttn= document.getElementById("searchByTopic")
         const searchNameBttn= document.getElementById("searchByName")
-        const searchTopicInput=document.getElementById("searchTopic")
         const searchNameInput=document.getElementById("searchName")
         const viewAllButton= document.getElementById("viewAllButton")
         const form=document.querySelector("form")
@@ -116,6 +124,10 @@
         
         );
             
+        needsReviewCheckbox.addEventListener("change", function(event){
+            currentNeedsReview= needsReviewCheckbox.checked;
+            refreshTable();
+        })
         
         
        
@@ -124,65 +136,27 @@
             loadProblems();
         })
         
-        reviewButton.addEventListener("click", function(event){
-            event.preventDefault();
-            fetch("/get-needs-review")
-            .then(response=> response.json())
-            .then(data=> {
-                const table= document.querySelector("table")
-                table.innerHTML= `<tr>
-                    <th>Problem Name</th>
-                    <th>Topic</th>
-                    <th>Difficulty</th>
-                    <th>Last Reviewed</th>
-                    <th>Action</th>
-                </tr>`
 
-                for (const problem of data) {
-                    buildRow(problem,table);
-                 
+        searchNameInput.addEventListener("keydown", function(event){
+            if (event.key==="Enter"){
+                event.preventDefault();
+                fetch("/search-by-name?partial="+searchNameInput.value)
+                .then(response=>response.json())
+                .then(data=>{
+                    const table=document.querySelector("table")
+                    table.innerHTML=`<tr>
+                        <th>Problem Name</th>
+                        <th>Topic</th>
+                        <th>Difficulty</th>
+                        <th>Last Reviewed</th>
+                        <th>Action</th>
+                    </tr>`
+                    for (const problem of data) {
+                        buildRow(problem,table);
+                    
                 }
             })
-
-        });
-
-        searchTopicBttn.addEventListener("click", function(event){
-            event.preventDefault();
-            fetch("/search-by-topic?partial="+searchTopicInput.value)
-            .then(response=>response.json())
-            .then(data=>{
-                const table= document.querySelector("table")
-                table.innerHTML= `<tr>
-                    <th>Problem Name</th>
-                    <th>Topic</th>
-                    <th>Difficulty</th>
-                    <th>Last Reviewed</th>
-                    <th>Action</th>
-                </tr>`
-                for (const problem of data) {
-                    buildRow(problem,table);
-                }
-            })
-        })
-        
-        searchNameBttn.addEventListener("click", function(event){
-            event.preventDefault();
-            fetch("/search-by-name?partial="+searchNameInput.value)
-            .then(response=>response.json())
-            .then(data=>{
-                const table=document.querySelector("table")
-                table.innerHTML=`<tr>
-                    <th>Problem Name</th>
-                    <th>Topic</th>
-                    <th>Difficulty</th>
-                    <th>Last Reviewed</th>
-                    <th>Action</th>
-                </tr>`
-                for (const problem of data) {
-                    buildRow(problem,table);
-                }
-            })
-        })
+        }})
 
         button.addEventListener("click", function(event){
             event.preventDefault();
@@ -201,12 +175,14 @@
         });
 
         function refreshTable(){
-            if  (currentDifficulties.length===0 && currentTopics.length===0){
+            if  (currentDifficulties.length===0 && currentTopics.length===0 && currentNeedsReview===false){
                 loadProblems();
             } else {
                 const params= new URLSearchParams();
                 currentDifficulties.forEach(value=> params.append("difficulties",value));
                 currentTopics.forEach(value=> params.append("topics",value));
+                params.append("needs_review",currentNeedsReview);
+
                 fetch(`/filter-problems?${params.toString()}`)
                 .then (response=> response.json())
                 .then (data=>renderProblems(data))
@@ -268,11 +244,28 @@
             pencilBttn4.textContent="✏️";
             pencilBttn4.style.marginLeft = "10px";
             const difficultyCell=document.createElement("td");
-            difficultyWrapper.textContent=problem.difficulty;
+
+            let difficultyClass; 
+            if (problem.difficulty==="Easy") {
+                difficultyClass= "difficulty-easy";
+            } else if (problem.difficulty==="Medium"){
+                difficultyClass = "difficulty-medium";
+            } else if (problem.difficulty==="Hard") {
+                difficultyClass= "difficulty-hard";
+            }
+
+            const difficultyPill=document.createElement("span")
+            difficultyPill.textContent=problem.difficulty
+            
+            difficultyPill.classList.add("difficulty-pill", difficultyClass);
+            difficultyCell.classList.add("difficulty-td")
+            difficultyWrapper.appendChild(difficultyPill);
+
             difficultyWrapper.appendChild(pencilBttn4);
             difficultyCell.appendChild(difficultyWrapper)
             newRow.appendChild(difficultyCell);
-            difficultyWrapper.classList.add("editable-cell")
+            difficultyWrapper.classList.add("editable-cell", "difficulty-wrapper")
+
 
             //last_reviewed cell
             const lrWrapper=document.createElement("span")

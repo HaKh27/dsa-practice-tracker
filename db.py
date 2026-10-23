@@ -50,7 +50,7 @@ def filter_by_difficulty(conn,value):
     """ , value)
     return cursor.fetchall()
 
-def filter_problems(conn, difficulties, topics):
+def filter_problems(conn, difficulties, topics, needs_review):
     conditions=[]
     params=[]
 
@@ -63,6 +63,20 @@ def filter_problems(conn, difficulties, topics):
         placeholders= ", ".join(["%s"]*len(topics))
         conditions.append(f"LOWER(topic) IN ({placeholders})")
         params.extend([t.lower() for t in topics])
+    
+    if needs_review: 
+        order_clause= "last_reviewed ASC"
+        cutoff=str(date.today()-timedelta(days=7))
+        conditions.append("last_reviewed< %s")
+        params.append(cutoff)
+    else: 
+        order_clause="""
+        CASE difficulty
+            WHEN 'Easy' THEN 1
+            WHEN 'Medium' THEN 2
+            WHEN 'Hard' THEN 3 
+        END
+    """
 
     where_clause= " AND ".join(conditions) if conditions else "TRUE"
 
@@ -70,12 +84,7 @@ def filter_problems(conn, difficulties, topics):
     cursor.execute(f"""
         SELECT * FROM problems 
         WHERE {where_clause}
-        ORDER BY 
-            CASE difficulty
-                WHEN 'Easy' THEN 1
-                WHEN 'Medium' THEN 2
-                WHEN 'Hard' THEN 3 
-            END
+        ORDER BY {order_clause}
     """, params)
     return cursor.fetchall()
 

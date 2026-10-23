@@ -20,12 +20,7 @@ td {
     display:flex;
 }
 
-#name{
-    color:rgb(251, 251, 251);
-    padding: 5px;
 
-
-}
 
 th{
     padding:8px;
@@ -185,8 +180,12 @@ label,p {
     top: 100%;
     left: 0%;
     padding: 0.5%;
-    background-color: black;
+    background: rgba(30, 30, 40, 0.8);   /* semi-transparent dark tint, not solid black */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(90px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 10%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     min-width: 180px;
 
 }
@@ -197,6 +196,7 @@ label,p {
 }
 .category-toggle{
     font-weight:bold;
+    text-align: left;
 }
 
 .category-options label{
@@ -204,4 +204,59 @@ label,p {
     align-items:center;
     gap: 10px;
     font-weight: normal;
+}
+
+.search-pill{
+    align-items: center;
+    display:flex;
+
+}
+
+.difficulty-pill {
+    align-items: center;
+    display:inline-flex;
+    justify-content: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size:0.85em;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.difficulty-easy {
+    background-color: rgba(46, 125, 50, 0.35);
+    border: 1px solid rgba(46, 125, 50, 0.7);
+    color: white;
+}
+
+.difficulty-medium {
+    background-color: rgba(249, 168, 37, 0.3);
+    border: 1px solid rgba(249, 168, 37, 0.7);
+    color: white;
+}
+
+.difficulty-hard {
+    background-color: rgba(198, 40, 40, 0.35);
+    border: 1px solid rgba(198, 40, 40, 0.7);
+    color: white;
+}
+
+.difficulty-td{
+    text-align: center;
+    position: relative;
+}
+
+.difficulty-wrapper{
+    align-items: center;
+    display:inline-flex;
+    margin-right:22px;
+}
+
+.difficulty-td button{
+    position:absolute;
+    right:8px;
+    top:50%;
+    transform: translateY(-50%);
+
 }

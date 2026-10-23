@@ -107,8 +107,9 @@ def filter_problem():
     conn= get_connection()
     difficulties= request.args.getlist("difficulties")
     topics= request.args.getlist("topics")
+    needs_review= request.args.get("needs_review")=="true" 
 
-    result= filter_problems(conn, difficulties, topics)
+    result= filter_problems(conn, difficulties, topics,needs_review)
 
     data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
     return jsonify(data)
