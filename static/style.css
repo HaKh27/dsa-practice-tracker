@@ -81,6 +81,7 @@ input, select {
     border-radius: 10px;
     border:none;
     padding: 10px;
+    color-scheme: dark;
 }
 
 form {
@@ -112,7 +113,7 @@ label,p {
     justify-content: space-between;
     align-items: center;
     padding: 15px 30px;
-    background-color: rgba(14, 15, 38, 0.961);
+    background-color: rgba(9, 11, 41, 0.961);
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border:1px solid rgba(40, 23, 68, 0.2);

@@ -22,9 +22,9 @@
     
         <div class="filter-wrapper">
         <button id="filterButton" class="filter-btn">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-            <path d="M3 4h18l-7 8v6l-4 2v-8z"/>
-        </svg>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M3 4h18l-7 8v6l-4 2v-8z"/>
+            </svg>
         </button>
         <div id="filterPanel" class="filter-panel hidden">
         <div class="filter-category">
@@ -37,7 +37,7 @@
         </div>
         <div class="filter-category">
             <button class="category-toggle" id="topicToggle">Topics</button>
-            <div class="category-options hidden" id="topicOptions">
+            <div class="category-options hidden" id="topicOptions"></div>
         </div>
 
         <div class="filter-category">
@@ -47,7 +47,14 @@
             </div> 
         </div>
 
+
         </div>
+        <button type= "button" id="addButton">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+        </button>
     </div>
     </div>
     </div>
@@ -55,7 +62,7 @@
     <div class="container">
     
         <form>
-            <div class="problem_form">
+            <div id= "problemForm" class="problem_form hidden">
         <p>Add a new problem: </p>
         <label for ="name">Problem Name: </label>
         <input type="text" id="name" name="name" placeholder="e.g. Two Sum">
@@ -102,7 +109,13 @@
         const viewAllButton= document.getElementById("viewAllButton")
         const form=document.querySelector("form")
         const filterButton=document.getElementById("filterButton")
+        const addButton= document.getElementById("addButton")
 
+        addButton.addEventListener("click", function(event){
+            document.getElementById("problemForm")
+
+            .classList.toggle("hidden")
+        });
 
         filterButton.addEventListener("click", function(event){
            document.getElementById("filterPanel")
