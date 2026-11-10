@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql, get_by_topic,find_by_name_sql, update_field_sql, filter_by_difficulty, filter_problems, get_distinct_topics
+from db import get_connection,insert_problems, get_all_problems, needs_review,delete_problem_sql, edit_topic_by_id_sql, get_by_topic,find_by_name_sql, update_field_sql, filter_by_difficulty, filter_problems, get_distinct_topics, recently_reviewed
 from datetime import date 
 from dsa_tracker import convert_rows
 
@@ -120,6 +120,13 @@ def distinct_topics():
     conn= get_connection()
     result= get_distinct_topics(conn)
     data = [r[0] for r in result]
+    return jsonify(data)
+
+@app.route("/reviewed", methods=["GET"])
+def reviewed():
+    conn= get_connection()
+    result= recently_reviewed(conn)
+    data = [{"id":r[0],"name":r[1],"topic":r[2], "difficulty":r[3],"last_reviewed": r[4]} for r in result]
     return jsonify(data)
 
 

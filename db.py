@@ -113,6 +113,7 @@ def create_table(conn):
 
 
 def insert_problems(conn,name,topic,difficulty,last_reviewed=str(date.today())):
+    topic=topic.strip()
     cursor= conn.cursor()
     cursor.execute("""
         INSERT INTO problems(name, topic, difficulty, last_reviewed)
@@ -176,6 +177,18 @@ def needs_review(conn):
     FROM problems 
     WHERE last_reviewed < %s 
     ORDER BY last_reviewed ASC
+
+    """, (cutoff,))
+    return cursor.fetchall()
+
+def recently_reviewed(conn):
+    cutoff= str(date.today()-timedelta(days=6))
+    cursor= conn.cursor()
+    cursor.execute("""
+    SELECT * 
+    FROM problems 
+    WHERE last_reviewed >= %s 
+    ORDER BY last_reviewed DESC
 
     """, (cutoff,))
     return cursor.fetchall()
