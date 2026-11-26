@@ -2,28 +2,33 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import './App.css'
 import ProblemList from './components/ProblemList'
+import Header from './components/Header'
 
 function App() {
   const[problems, setProblems]= useState([])
   const [loading, setLoading]= useState(true)
   const [error, setError]= useState(false)
+
+  function loadProblems(){
+    fetch("/get-problems")
+        .then(res=>res.json())
+        .then(data=> {
+          setProblems(data);
+          setLoading(false);
+        })
+
+        .catch((err)=>{
+          setError(true);
+          setLoading(false);
+        
+        });
+    
+  }
+
   useEffect(()=>{
-      fetch("/get-problems")
-      .then(res=>res.json())
-      .then(data=> {
-        setProblems(data);
-        setLoading(false);
-      })
-      
-
-      .catch((err)=>{
-        setError(true);
-        setLoading(false);
-      
-      });
-     
-
-  },[])
+    loadProblems()
+    
+},[])
 
   let content;
   if (loading){
@@ -37,6 +42,7 @@ function App() {
 
   return (
     <>
+      <Header onTitleClick={loadProblems}/>
       <section id="center">
         {content}
       </section>
@@ -45,5 +51,7 @@ function App() {
     </>
   )
 }
+
+
 
 export default App
